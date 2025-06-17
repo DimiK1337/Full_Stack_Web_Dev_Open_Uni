@@ -1,9 +1,11 @@
 import Part from "./Part";
 
 const Content = (props) => {
+    console.log("Content component rendered with props:", props);
+
     const pTags = [];
     props.parts.forEach((part, index) => {
-        pTags.push(<Part key={index} part={part.part} exercises={part.exercises} />);
+        pTags.push(<Part key={index} name={part.name} exercises={part.exercises} />);
     });
     return (
         <div>

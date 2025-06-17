@@ -1,7 +1,8 @@
 
 const Part = (props) => {
+    console.log("Part component rendered with props:", props);
     return (
-        <p>{props.part} {props.exercises}</p>
+        <p>{props.name} {props.exercises}</p>
     );
 };
 
