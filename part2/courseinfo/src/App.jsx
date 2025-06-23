@@ -1,5 +1,4 @@
 import Course from "./components/Course"
-import Total from "./components/Total"
 
 const App = () => {
 
