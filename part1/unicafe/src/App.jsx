@@ -8,7 +8,7 @@ const Button = (props) => {
   );
 }
 
-const Display = ({good, neutral, bad}) => {
+const Statistics = ({good, neutral, bad}) => {
 
   // Good is worth 1, Neutral is worth 0 (exclude from avg), Bad is worth -1
     // Formula: (good + 0*neutral + (-1)*bad) / (good + neutral + bad)
@@ -24,7 +24,6 @@ const Display = ({good, neutral, bad}) => {
       <p>All: {good + neutral + bad}</p>
       <p>Average: {calcAverage()}</p>
       <p>Positive Feedback %: {calcPositiveFeedback()}</p>
-
     </div>
   );
 }
@@ -36,20 +35,12 @@ const App = () => {
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
 
-  const handleGoodClick = () => {
-    console.log("good before", good)
-    setGood(good + 1)
-  }
+  const handleGoodClick = () => setGood(good + 1)
 
-  const handleNeutralClick = () => {
-    console.log("good before", neutral)
-    setNeutral(neutral + 1)
-  }
+  const handleNeutralClick = () => setNeutral(neutral + 1)
 
-  const handleBadClick = () => {
-    console.log("good before", bad)
-    setBad(bad + 1)
-  }
+  const handleBadClick = () => setBad(bad + 1)
+  
 
   return (
     <div>
@@ -59,8 +50,7 @@ const App = () => {
       <Button text="bad" onClick={handleBadClick}/>
 
       <h2>Statistics</h2>
-      <Display good={good} neutral={neutral} bad={bad}/>
-
+      <Statistics good={good} neutral={neutral} bad={bad}/>
     </div>
   )
 }
