@@ -16,6 +16,10 @@ const Statistics = ({good, neutral, bad}) => {
 
   const calcPositiveFeedback = () => (good/(good + neutral + bad)) * 100; 
 
+  if (!(good || neutral || bad)) {
+    return <p>No feedback given</p>
+  }
+
   return (
     <div>
       <p>Good: {good}</p>
