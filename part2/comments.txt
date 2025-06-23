@@ -1,0 +1,1 @@
+For "2.1: Course information step 6", I copied the folder "courseinfo" from part1 and have placed it in part2. I did delete the node_modules and ran `npm i` to refresh everything. Was not sure if I should edit the folder in part1.
