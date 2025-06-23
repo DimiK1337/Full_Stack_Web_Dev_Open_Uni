@@ -8,6 +8,13 @@ const Button = (props) => {
   );
 }
 
+const StatisticsLine = (props) => {
+
+  return (
+    <p>{props.text}: {props.value}</p>
+  );
+}
+
 const Statistics = ({good, neutral, bad}) => {
 
   // Good is worth 1, Neutral is worth 0 (exclude from avg), Bad is worth -1
@@ -22,12 +29,12 @@ const Statistics = ({good, neutral, bad}) => {
 
   return (
     <div>
-      <p>Good: {good}</p>
-      <p>Neutral: {neutral}</p>
-      <p>Bad: {bad}</p>
-      <p>All: {good + neutral + bad}</p>
-      <p>Average: {calcAverage()}</p>
-      <p>Positive Feedback %: {calcPositiveFeedback()}</p>
+      <StatisticsLine text="Good" value={good} />
+      <StatisticsLine text="Neutral" value={neutral} />
+      <StatisticsLine text="Bad" value={bad} />
+      <StatisticsLine text="All" value={good + neutral + bad} />
+      <StatisticsLine text="Average" value={calcAverage()} />
+      <StatisticsLine text="Positive Feedback %" value={calcPositiveFeedback()} />
     </div>
   );
 }
@@ -40,12 +47,9 @@ const App = () => {
   const [bad, setBad] = useState(0)
 
   const handleGoodClick = () => setGood(good + 1)
-
   const handleNeutralClick = () => setNeutral(neutral + 1)
-
   const handleBadClick = () => setBad(bad + 1)
   
-
   return (
     <div>
       <h1>Give Feedback</h1>
