@@ -46,7 +46,7 @@ const App = () => {
       <Anecdote text={anecdotes[selected]} votes={votes[selected]}/>
       <Button onClick={handleNextButtonClick} text="next anecdote"/>
       <Button onClick={handleVoteButtonClick} text="vote"/>
-      
+
       <h1>Anecdote with most votes</h1>
       <Anecdote text={anecdotes[getMostPopularAnecdoteIndex()]} votes={votes[getMostPopularAnecdoteIndex()]} />
 
