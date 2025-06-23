@@ -9,19 +9,21 @@ const Button = (props) => {
 }
 
 const StatisticsLine = (props) => {
-
   return (
-    <p>{props.text}: {props.value}</p>
+    <tr>
+      <td>{props.text}</td>
+      <td>{props.value}</td>
+    </tr>
   );
 }
 
-const Statistics = ({good, neutral, bad}) => {
+const Statistics = ({ good, neutral, bad }) => {
 
   // Good is worth 1, Neutral is worth 0 (exclude from avg), Bad is worth -1
-    // Formula: (good + 0*neutral + (-1)*bad) / (good + neutral + bad)
-  const calcAverage = () => (good + -1*bad)/(good + neutral + bad)
+  // Formula: (good + 0*neutral + (-1)*bad) / (good + neutral + bad)
+  const calcAverage = () => (good + -1 * bad) / (good + neutral + bad)
 
-  const calcPositiveFeedback = () => (good/(good + neutral + bad)) * 100; 
+  const calcPositiveFeedback = () => (good / (good + neutral + bad)) * 100;
 
   if (!(good || neutral || bad)) {
     return <p>No feedback given</p>
@@ -29,12 +31,16 @@ const Statistics = ({good, neutral, bad}) => {
 
   return (
     <div>
-      <StatisticsLine text="Good" value={good} />
-      <StatisticsLine text="Neutral" value={neutral} />
-      <StatisticsLine text="Bad" value={bad} />
-      <StatisticsLine text="All" value={good + neutral + bad} />
-      <StatisticsLine text="Average" value={calcAverage()} />
-      <StatisticsLine text="Positive Feedback %" value={calcPositiveFeedback()} />
+      <table>
+        <tbody>
+          <StatisticsLine text="Good" value={good} />
+          <StatisticsLine text="Neutral" value={neutral} />
+          <StatisticsLine text="Bad" value={bad} />
+          <StatisticsLine text="All" value={good + neutral + bad} />
+          <StatisticsLine text="Average" value={calcAverage()} />
+          <StatisticsLine text="Positive %" value={calcPositiveFeedback()} />
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -49,16 +55,16 @@ const App = () => {
   const handleGoodClick = () => setGood(good + 1)
   const handleNeutralClick = () => setNeutral(neutral + 1)
   const handleBadClick = () => setBad(bad + 1)
-  
+
   return (
     <div>
       <h1>Give Feedback</h1>
-      <Button text="good" onClick={handleGoodClick}/>
-      <Button text="neutral" onClick={handleNeutralClick}/>
-      <Button text="bad" onClick={handleBadClick}/>
+      <Button text="good" onClick={handleGoodClick} />
+      <Button text="neutral" onClick={handleNeutralClick} />
+      <Button text="bad" onClick={handleBadClick} />
 
       <h2>Statistics</h2>
-      <Statistics good={good} neutral={neutral} bad={bad}/>
+      <Statistics good={good} neutral={neutral} bad={bad} />
     </div>
   )
 }
