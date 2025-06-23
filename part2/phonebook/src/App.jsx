@@ -1,12 +1,8 @@
 import { useState } from 'react'
 
-
-const Entry = ({ person }) => {
-
-  return (
-    <li>{person.name} : {person.number}</li>
-  );
-}
+import Filter from './components/Filter'
+import PersonForm from './components/PersonForm'
+import Persons from './components/Persons'
 
 
 const App = () => {
@@ -40,30 +36,25 @@ const App = () => {
   const handleNumberChange = (event) => setNewNumber(event.target.value)
 
 
+
+  const personFormProps = {
+    addName,
+    newName,
+    handleNameChange,
+    newNumber,
+    handleNumberChange
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        filter shown with <input value={filterQuery} onChange={handleFilterQueryChange} />
-      </div>
+      <Filter value={filterQuery} onChange={handleFilterQueryChange}/>
 
       <h2>Add a new</h2>
-      <form onSubmit={addName}>
-        <div>
-          name: <input value={newName} onChange={handleNameChange} />
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={handleNumberChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <PersonForm {...personFormProps} />
+
       <h2>Numbers</h2>
-      {persons.map(
-        person => person.name.toLowerCase().includes(filterQuery.toLowerCase()) 
-          ? <Entry key={person.name} person={person} /> : ''
-      )}
+      <Persons persons={persons} filterQuery={filterQuery}/>
     </div>
   )
 }
