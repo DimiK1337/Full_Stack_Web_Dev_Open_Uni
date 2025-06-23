@@ -9,11 +9,22 @@ const Button = (props) => {
 }
 
 const Display = ({good, neutral, bad}) => {
+
+  // Good is worth 1, Neutral is worth 0 (exclude from avg), Bad is worth -1
+    // Formula: (good + 0*neutral + (-1)*bad) / (good + neutral + bad)
+  const calcAverage = () => (good + -1*bad)/(good + neutral + bad)
+
+  const calcPositiveFeedback = () => (good/(good + neutral + bad)) * 100; 
+
   return (
     <div>
       <p>Good: {good}</p>
       <p>Neutral: {neutral}</p>
       <p>Bad: {bad}</p>
+      <p>All: {good + neutral + bad}</p>
+      <p>Average: {calcAverage()}</p>
+      <p>Positive Feedback %: {calcPositiveFeedback()}</p>
+
     </div>
   );
 }
