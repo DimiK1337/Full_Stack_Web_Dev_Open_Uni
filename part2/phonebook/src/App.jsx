@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-import axios from 'axios'
+import personService from "./services/persons"
 
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
@@ -14,12 +14,9 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
 
   const hook = () => {
-    axios
-      .get("http://localhost:3001/persons")
-      .then((res) => {
-        console.log("res successful")
-        setPersons(res.data)
-      })
+    personService
+      .getAll()
+      .then(initialPersons => setPersons(initialPersons))
   }
   useEffect(hook, [])
 
@@ -31,16 +28,21 @@ const App = () => {
         return
       }
     }
-    setPersons(persons.concat({ name: newName, number: newNumber }))
-    setNewName('')
-    setNewNumber('')
+
+    const newPerson = { name: newName, number: newNumber }
+
+    personService
+      .create(newPerson)
+      .then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson))
+        setNewName('')
+        setNewNumber('')
+      })
   }
 
   const handleFilterQueryChange = (event) => setFilterQuery(event.target.value)
   const handleNameChange = (event) => setNewName(event.target.value)
   const handleNumberChange = (event) => setNewNumber(event.target.value)
-
-
 
   const personFormProps = {
     addName,
