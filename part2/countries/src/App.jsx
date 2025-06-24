@@ -6,6 +6,9 @@ import CountryList from './components/CountryList'
 
 import countryService from './services/countries'
 
+/*
+Note: Antartica does not have a "capitalInfo" object, so no weather data can be returned
+ */
 
 const App = () => {
 
