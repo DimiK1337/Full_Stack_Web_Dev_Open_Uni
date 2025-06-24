@@ -15,29 +15,46 @@ const App = () => {
 
   const hook = () => {
     personService
-      .getAll()
+      .getAllPersons()
       .then(initialPersons => setPersons(initialPersons))
   }
   useEffect(hook, [])
 
   const addName = (event) => {
     event.preventDefault()
-    for (const person of persons) {
-      if (person.name === newName) {
-        alert(`${newName} is already added to phonebook`)
-        return
-      }
+
+    if (persons.some(person => person.name === newName)) {
+      alert(`${newName} is already added to phonebook`)
+      return
     }
 
     const newPerson = { name: newName, number: newNumber }
 
     personService
-      .create(newPerson)
+      .createPerson(newPerson)
       .then(returnedPerson => {
         setPersons(persons.concat(returnedPerson))
         setNewName('')
         setNewNumber('')
       })
+  }
+
+  const deleteName = (event) => {
+    const personToDelete = persons.find(person => person.id === event.target.value)
+    const shouldDeletePerson = window.confirm(`Delete '${personToDelete.name}'?`)
+
+    if (!shouldDeletePerson) return
+
+    personService
+      .deletePerson(personToDelete.id)
+
+    personService
+      .getAllPersons()
+      .then(
+        returnedPersons => setPersons(
+          returnedPersons.filter(person => person.id !== personToDelete.id)
+        )
+      )
   }
 
   const handleFilterQueryChange = (event) => setFilterQuery(event.target.value)
@@ -61,7 +78,7 @@ const App = () => {
       <PersonForm {...personFormProps} />
 
       <h2>Numbers</h2>
-      <Persons persons={persons} filterQuery={filterQuery} />
+      <Persons persons={persons} filterQuery={filterQuery} onDelete={deleteName} />
     </div>
   )
 }

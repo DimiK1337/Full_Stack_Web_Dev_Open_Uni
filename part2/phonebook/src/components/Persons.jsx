@@ -1,16 +1,16 @@
 
-const Entry = ({ person }) => {
+const Persons = ({ persons, filterQuery, onDelete }) => {
+    const peopleToShow = persons.filter(person => person.name.toLowerCase().includes(filterQuery.toLowerCase()))
     return (
-        <li>{person.name} : {person.number}</li>
-    );
-}
 
-const Persons = ({ persons, filterQuery }) => {
-    return (
-        persons.map(
-            person => person.name.toLowerCase().includes(filterQuery.toLowerCase())
-                ? <Entry key={person.name} person={person} /> : ''
-        )
+        peopleToShow.map(person => {
+            return (
+                <div key={person.id}>
+                    {person.name} : {person.number}
+                    <button onClick={onDelete} value={person.id}>delete</button>
+                </div>
+            );
+        })
     );
 }
 

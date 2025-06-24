@@ -3,19 +3,24 @@ import axios from 'axios'
 const port = 3001
 const baseurl = `http://localhost:${port}/persons`
 
-const getAll = () => {
+const getAllPersons = () => {
     const request = axios.get(baseurl)
     return request.then(res => res.data)
 }
 
-const create = (newObject) => {
+const createPerson = (newObject) => {
     const request = axios.post(baseurl, newObject)
     return request.then(res => res.data)
 }
 
-const update = (id, newObject) => {
+const updatePerson = (id, newObject) => {
     const request = axios.put(`${baseurl}/${id}`, newObject)
     return request.then(res => res.data)
 }
 
-export default { getAll, create, update }
+const deletePerson = (id) => {
+    const request = axios.delete(`${baseurl}/${id}`)
+    return request.then(res => res.data)
+}
+
+export default { getAllPersons, createPerson, updatePerson, deletePerson }
