@@ -5,6 +5,7 @@ import personService from "./services/persons"
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import Notification from './components/Notification'
 
 
 const App = () => {
@@ -12,6 +13,7 @@ const App = () => {
   const [filterQuery, setFilterQuery] = useState('')
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
+  const [notification, setNotification] = useState({ message: null, isError: false })
 
   const hook = () => {
     personService
@@ -34,16 +36,44 @@ const App = () => {
       personService
         .updatePerson(existingPerson.id, newPerson)
         .then(
-          returnedPerson => setPersons(
-            persons.map(person => person.id === returnedPerson.id ? returnedPerson : person)
-          )
+          returnedPerson => {
+            setNotification({
+              message: `'${returnedPerson.name}' has changed their number to '${returnedPerson.number}'`,
+              isError: false
+            })
+
+            setTimeout(() => {
+              setNotification({
+                message: null,
+                isError: false
+              })
+            }, 5000)
+
+            setPersons(persons.map(person => person.id === returnedPerson.id ? returnedPerson : person))
+
+            setNewName('')
+            setNewNumber('')
+          }
         )
+
       return
     }
 
     personService
       .createPerson(newPerson)
       .then(returnedPerson => {
+        setNotification({
+          message: `Added '${returnedPerson.name}'`,
+          isError: false
+        })
+
+        setTimeout(() => {
+          setNotification({
+            message: null,
+            isError: false
+          })
+        }, 5000)
+
         setPersons(persons.concat(returnedPerson))
         setNewName('')
         setNewNumber('')
@@ -83,6 +113,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification.message} isError={notification.isError} />
       <Filter value={filterQuery} onChange={handleFilterQueryChange} />
 
       <h2>Add a new</h2>
