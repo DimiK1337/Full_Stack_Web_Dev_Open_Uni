@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 
 import Country from './components/Country'
+import CountryList from './components/CountryList'
 
 import countryService from './services/countries'
 
@@ -9,7 +10,6 @@ import countryService from './services/countries'
 const App = () => {
 
   const [countrySearch, setCountrySearch] = useState('')
-
   const [countries, setCountries] = useState([])
   const [countriesToShow, setCountriesToShow] = useState([])
 
@@ -31,23 +31,25 @@ const App = () => {
     )
   }
 
-
+  const handleShowCountry = (country) => {
+    setCountriesToShow([country])
+  }
 
   return (
     <div>
       <div>
-        find countries: <input value={countrySearch} onChange={handleCountrySearch}/>
+        find countries: <input value={countrySearch} onChange={handleCountrySearch} />
         {
           // Have to use a double ternary for the triple condition
           // If the amount is over 10 -> "Be more specific"
           // Else if the countries to show has len 1 -> Full info
           // Else the remaining countries
 
-          countriesToShow.length > 10 
+          countriesToShow.length > 10
             ? <p>Too many matches, specify another filter</p>
             : countriesToShow.length === 1
-              ? <Country country={countriesToShow[0]}/>
-              : countriesToShow.map(c => <p key={c.name.common}>{c.name.common}</p>)
+              ? <Country country={countriesToShow[0]} />
+              : <CountryList countries={countriesToShow} onShowCountry={handleShowCountry} />
         }
       </div>
     </div>
