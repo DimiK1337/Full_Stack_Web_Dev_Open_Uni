@@ -27,12 +27,20 @@ const persons = [
 
 app.use(express.json());
 
+
+// GET
 app.get("/", (req, res) => {
     res.send('<h1>Phonebook Backend</h1><a href="http://localhost:3001/api/persons">Go to /api/persons</a>');
 });
 
 app.get("/api/persons", (req, res) => {
     res.json(persons);
+});
+
+app.get("/info", (req, res) => {
+    const date = new Date();
+    const info = `<p>Phonebook has info for ${persons.length} people</p><p>${date}</p>`;
+    res.send(info);
 });
 
 const PORT = process.env.PORT || 3001;
