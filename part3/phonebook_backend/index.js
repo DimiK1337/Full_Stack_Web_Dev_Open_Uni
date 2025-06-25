@@ -1,6 +1,7 @@
 const express = require("express");
-
 const app = express();
+
+const morgan = require("morgan");
 
 let persons = [
     {
@@ -25,8 +26,12 @@ let persons = [
     },
 ];
 
+// MIDDLEWARE
 app.use(express.json());
 
+app.use(morgan("tiny"));
+
+// ENDPOINTS
 
 // GET
 app.get("/", (req, res) => {
@@ -84,6 +89,12 @@ app.delete("/api/persons/:id", (req, res) => {
     persons = persons.filter(person => person.id !== id);
     res.status(204).end();
 });
+
+// MIDDLEWARE for unknown endpoints
+const unknownEndpoint = (req, res) => {
+    res.status(404).send({ error: "Unknown endpoint" });
+};
+app.use(unknownEndpoint);
 
 
 const PORT = process.env.PORT || 3001;
