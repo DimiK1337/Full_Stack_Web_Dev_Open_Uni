@@ -1,2 +1,2 @@
 The exercises for part 3.a are in part3/phonebook_backend
-The exercises for part 3.b are in part3/phonebook_frontend
+The course demo code (not exercises) for part 3.b are in part3/part2-notes-frontend
