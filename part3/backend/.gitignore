@@ -18,8 +18,6 @@ logs/
 Thumbs.db
 
 # Build output
-dist/
-build/
 
 # Editor directories and files
 .vscode/
