@@ -34,13 +34,12 @@ morgan.token("body", (req) => {
 });
 app.use(morgan(":method :url :status :res[content-length] - :response-time ms :body"));
 
+app.use(express.static('dist'))
+
 
 // ENDPOINTS
 
 // GET
-app.get("/", (req, res) => {
-    res.send('<h1>Phonebook Backend</h1><a href="http://localhost:3001/api/persons">Go to /api/persons</a>');
-});
 
 app.get("/info", (req, res) => {
     const date = new Date();
