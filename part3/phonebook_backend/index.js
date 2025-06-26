@@ -85,7 +85,8 @@ app.put("/api/persons/:id", (req, res, next) => {
     };
 
     // Find the person by ID and update it, returning the updated document (new:true)
-    Person.findByIdAndUpdate(id, person, { new:true })
+    // and running validators to ensure the updated document is valid
+    Person.findByIdAndUpdate(id, person, { new:true, runValidators: true })
         .then(updatedPerson => {
             if (!updatedPerson) {
                 return res.status(404).send({ error: "Person not found" });
@@ -116,6 +117,9 @@ const errorHandler = (error, req, res, next) => {
 
     if (error.name === "CastError") {
         return res.status(400).send({ error: "Malformed ID" });
+    }
+    if (error.name === "ValidationError") {
+        return res.status(400).json({ error: error.message });
     }
 
     next(error);

@@ -22,6 +22,18 @@ const App = () => {
   }
   useEffect(hook, [])
 
+  const clearForm = () => {
+    setNewName('')
+    setNewNumber('')
+  }
+
+  const clearNotification = () => setTimeout(() => {
+    setNotification({
+      message: null,
+      isError: false
+    })
+  }, 5000)
+
   const addName = (event) => {
     event.preventDefault()
 
@@ -41,29 +53,19 @@ const App = () => {
               message: `'${returnedPerson.name}' has changed their number to '${returnedPerson.number}'`,
               isError: false
             })
-
-            setTimeout(() => {
-              setNotification({
-                message: null,
-                isError: false
-              })
-            }, 5000)
+            clearNotification()
 
             setPersons(persons.map(person => person.id === returnedPerson.id ? returnedPerson : person))
-
-            setNewName('')
-            setNewNumber('')
+            clearForm()
           }
         )
         .catch(error => {
+          if (error.response.data.error) console.error(error.response.data.error)
           setNotification({
             message: `Information of '${existingPerson.name}' has already been removed from server`,
             isError: true
           })
-
-          setTimeout(() => {
-            setNotification({ message: null, isError: false })
-          }, 5000)
+          clearNotification()
 
           setPersons(persons.filter(person => person.id !== existingPerson.id))
         })
@@ -78,17 +80,18 @@ const App = () => {
           message: `Added '${returnedPerson.name}'`,
           isError: false
         })
-
-        setTimeout(() => {
-          setNotification({
-            message: null,
-            isError: false
-          })
-        }, 5000)
+        clearNotification()
 
         setPersons(persons.concat(returnedPerson))
-        setNewName('')
-        setNewNumber('')
+        clearForm()
+      })
+      .catch(error => {
+        if (error.response.data.error) console.error(error.response.data.error)
+        setNotification({
+          message: `Person validation failed - ${error.response.data.error}`,
+          isError: true
+        })
+        clearNotification()
       })
   }
 
@@ -100,14 +103,19 @@ const App = () => {
 
     personService
       .deletePerson(personToDelete.id)
+      .catch(error => {
+        if (error.response.data.error) console.error(error.response.data.error)
+      })
+
 
     personService
       .getAllPersons()
-      .then(
-        returnedPersons => setPersons(
-          returnedPersons.filter(person => person.id !== personToDelete.id)
-        )
-      )
+      .then(returnedPersons => setPersons(
+        returnedPersons.filter(person => person.id !== personToDelete.id)
+      ))
+      .catch(error => {
+        if (error.response.data.error) console.error(error.response.data.error)
+      })
   }
 
   const handleFilterQueryChange = (event) => setFilterQuery(event.target.value)
