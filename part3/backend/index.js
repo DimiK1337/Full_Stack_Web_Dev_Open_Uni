@@ -27,19 +27,14 @@ const Note = require('./models/note'); // Import Note model
 
 // GET 
 
-app.get('/api/notes', (req, res) => {
+app.get('/api/notes', (req, res, next) => {
     //res.json(notes);
     Note.find({})
-        .then(notes => {
-            res.json(notes)
-        })
-        .catch(error => {
-            console.error('Error fetching notes:', error);
-            res.status(500).send({ error: 'Failed to fetch notes' });
-        });
+        .then(notes => res.json(notes))
+        .catch(error => next(error)); // Pass error to the error handler
 });
 
-app.get('/api/notes/:id', (req, res) => {
+app.get('/api/notes/:id', (req, res, next) => {
     const id = req.params.id;
     Note.findById(id)
         .then(note => {
@@ -47,17 +42,15 @@ app.get('/api/notes/:id', (req, res) => {
                 res.json(note);
             }
             else {
-                res.status(404).send({ error: 'Note not found' });
+                //res.status(404).send({ error: 'Note not found' });
+                res.status(404).end();
             }
         })
-        .catch(error => {
-            console.error('Error fetching note:', error);
-            res.status(500).send({ error: 'Note not found' });
-        });
+        .catch(error => next(error)); // Pass error to the error handler
 });
 
 // POST
-app.post('/api/notes', (req, res) => {
+app.post('/api/notes', (req, res, next) => {
     const body = req.body;
     if (!body.content) {
         return res.status(400).json({ error: 'Content is missing' });
@@ -71,15 +64,33 @@ app.post('/api/notes', (req, res) => {
         .then(savedNote => {
             res.status(201).json(savedNote);
         })
-        .catch(error => {
-            console.error('Error saving note:', error);
-            res.status(500).send({ error: 'Failed to save note' });
-        });
+        .catch(error => next(error)); // Pass error to the error handler
     
 });
 
+// PUT
+app.put('/api/notes/:id', (req, res, next) => {
+    const id = req.params.id;
+    const { content, important } = req.body;
+
+    Note.findById(id)
+        .then(note => {
+            if (!note) {
+                return res.status(404).end();
+            }
+            note.content = content;
+            note.important = important;
+
+            return note.save()
+                .then(updatedNote => {
+                    res.json(updatedNote);
+                });
+        })
+        .catch(error => next(error)); // Pass error to the error handler
+})
+
 // DELETE
-app.delete('/api/notes/:id', (req, res) => {
+app.delete('/api/notes/:id', (req, res, next) => {
     const id = req.params.id;
     /* notes = notes.filter(note => note.id !== id);
     res.status(204).end(); */
@@ -87,11 +98,27 @@ app.delete('/api/notes/:id', (req, res) => {
         .then(() => {
             res.status(204).end();
         })
-        .catch(error => {
-            console.error('Error deleting note:', error);
-            res.status(500).send({ error: 'Failed to delete note' });
-        });
+        .catch(error => next(error)); // Pass error to the error handler
 });
+
+// MIDDLEWARE (Post routes)
+
+const unknownEndpoint = (req, res) => {
+    res.status(404).send({ error: 'Unknown endpoint' });
+};
+app.use(unknownEndpoint);
+
+const errorHandler = (error, req, res, next) => {
+    console.error(error.message);
+
+    if (error.name === 'CastError') {
+        return res.status(400).send({ error: 'Malformed ID' });
+    }
+
+    next(error); // Pass the error to the default express error handler middleware
+};
+
+app.use(errorHandler); // ERROR HANDLING MUST BE THE LAST MIDDLEWARE
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
