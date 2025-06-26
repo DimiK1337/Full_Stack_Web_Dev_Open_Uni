@@ -1,5 +1,5 @@
-The exercises for part 3 are in part3/phonebook_backend
-The course demo code (not exercises) for part 3 are in part3/frontend
+The exercises for part 3 are in part3/phonebook_backend and part3/phonebook_frontend
+The course demo code (not exercises) for part 3 are in part3/backend and part3/frontend
 
 Render phonebook fullstack: 
 https://phonebook-backend-vmop.onrender.com/
