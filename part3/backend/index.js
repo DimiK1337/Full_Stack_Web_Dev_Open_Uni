@@ -20,15 +20,12 @@ app.use(morgan(":method :url :status :res[content-length] - :response-time ms :b
 app.use(express.static('dist'))
 
 /* MongoDB */
-
 const Note = require('./models/note'); // Import Note model 
 
 /* ENDPOINT ROUTES */
 
 // GET 
-
 app.get('/api/notes', (req, res, next) => {
-    //res.json(notes);
     Note.find({})
         .then(notes => res.json(notes))
         .catch(error => next(error)); // Pass error to the error handler
@@ -42,7 +39,6 @@ app.get('/api/notes/:id', (req, res, next) => {
                 res.json(note);
             }
             else {
-                //res.status(404).send({ error: 'Note not found' });
                 res.status(404).end();
             }
         })
@@ -65,7 +61,6 @@ app.post('/api/notes', (req, res, next) => {
             res.status(201).json(savedNote);
         })
         .catch(error => next(error)); // Pass error to the error handler
-    
 });
 
 // PUT
@@ -113,6 +108,9 @@ const errorHandler = (error, req, res, next) => {
 
     if (error.name === 'CastError') {
         return res.status(400).send({ error: 'Malformed ID' });
+    }
+    if (error.name === 'ValidationError') {
+        return res.status(400).json({ error: error.message });
     }
 
     next(error); // Pass the error to the default express error handler middleware
