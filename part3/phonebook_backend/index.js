@@ -86,7 +86,7 @@ app.put("/api/persons/:id", (req, res, next) => {
 
     // Find the person by ID and update it, returning the updated document (new:true)
     // and running validators to ensure the updated document is valid
-    Person.findByIdAndUpdate(id, person, { new:true, runValidators: true })
+    Person.findByIdAndUpdate(id, person, { new:true, runValidators: true, context: 'query' })
         .then(updatedPerson => {
             if (!updatedPerson) {
                 return res.status(404).send({ error: "Person not found" });
