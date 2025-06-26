@@ -1,7 +1,11 @@
+require("dotenv").config();
+
 const express = require("express");
 const app = express();
 
 const morgan = require("morgan");
+
+const Person = require("./models/person"); 
 
 let persons = [
     {
@@ -26,18 +30,19 @@ let persons = [
     },
 ];
 
-// MIDDLEWARE
+/* MIDDLEWARE (Before route definitions) */
 app.use(express.json());
 
 morgan.token("body", (req) => {
     return JSON.stringify(req.body);
 });
+
 app.use(morgan(":method :url :status :res[content-length] - :response-time ms :body"));
 
-app.use(express.static('dist'))
+app.use(express.static('dist')); 
 
 
-// ENDPOINTS
+/* ENDPOINTS */
 
 // GET
 
@@ -49,7 +54,14 @@ app.get("/info", (req, res) => {
 
 
 app.get("/api/persons", (req, res) => {
-    res.json(persons);
+    Person.find({})
+        .then(returnedPersons => {
+            res.json(returnedPersons);
+        })
+        .catch(error => {
+            console.error("Error fetching persons:", error);
+            res.status(500).send({ error: "Failed to fetch persons" });
+        });
 });
 
 app.get("/api/persons/:id", (req, res) => {
