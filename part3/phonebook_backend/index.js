@@ -7,29 +7,6 @@ const morgan = require("morgan");
 
 const Person = require("./models/person"); 
 
-let persons = [
-    {
-        id: "1",
-        name: "Arto Hellas",
-        number: "040-123456",
-    },
-    {
-        id: "2",
-        name: "Ada Lovelace",
-        number: "39-44-5323523",
-    },
-    {
-        id: "3",
-        name: "Dan Abramov",
-        number: "12-43-234345",
-    },
-    {
-        id: "4",
-        name: "Mary Poppendieck",
-        number: "39-23-6423122",
-    },
-];
-
 /* MIDDLEWARE (Before route definitions) */
 app.use(express.json());
 
@@ -45,13 +22,14 @@ app.use(express.static('dist'));
 /* ENDPOINTS */
 
 // GET
-
-app.get("/info", (req, res) => {
+app.get("/info", (req, res, next) => {
     const date = new Date();
-    const info = `<p>Phonebook has info for ${persons.length} people</p><p>${date}</p>`;
-    res.send(info);
+    Person.countDocuments({})
+        .then(count => {
+            res.send(`<p>Phonebook has info for ${count} people</p><p>${date}</p>`)
+        })
+        .catch(error => next(error)); // Pass error to the error handler
 });
-
 
 app.get("/api/persons", (req, res, next) => {
     Person.find({})
@@ -61,14 +39,13 @@ app.get("/api/persons", (req, res, next) => {
         .catch(error => next(error)); // Pass error to the error handler
 });
 
-app.get("/api/persons/:id", (req, res) => {
+app.get("/api/persons/:id", (req, res, next) => {
     const id = req.params.id;
-    const person = persons.find(p => p.id === id);
-    if (person) {
-        res.json(person);
-    } else {
-        res.status(404).send({ error: "Person not found" });
-    }
+    Person.findById(id)
+        .then(person => {
+            res.json(person);
+        })
+        .catch(error => next(error)); // Pass error to the error handler
 });
 
 // POST
