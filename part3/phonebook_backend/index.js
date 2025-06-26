@@ -53,15 +53,12 @@ app.get("/info", (req, res) => {
 });
 
 
-app.get("/api/persons", (req, res) => {
+app.get("/api/persons", (req, res, next) => {
     Person.find({})
         .then(returnedPersons => {
             res.json(returnedPersons);
         })
-        .catch(error => {
-            console.error("Error fetching persons:", error);
-            res.status(500).send({ error: "Failed to fetch persons" });
-        });
+        .catch(error => next(error)); // Pass error to the error handler
 });
 
 app.get("/api/persons/:id", (req, res) => {
@@ -75,7 +72,7 @@ app.get("/api/persons/:id", (req, res) => {
 });
 
 // POST
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
     const body = req.body;
     if (!body.name || !body.number) {
         return res.status(400).json({ error: "Name or number is missing" });
@@ -94,25 +91,35 @@ app.post("/api/persons", (req, res) => {
         .then(savedPerson => {
             res.status(201).json(savedPerson);
         })
-        .catch(error => {
-            console.error("Error saving person:", error);
-            res.status(500).send({ error: "Failed to save person" });
-        })
+        .catch(error => next(error)); // Pass error to the error handler
 });
 
 // DELETE
-app.delete("/api/persons/:id", (req, res) => {
+app.delete("/api/persons/:id", (req, res, next) => {
     const id = req.params.id;
-    persons = persons.filter(person => person.id !== id);
-    res.status(204).end();
+    Person.findByIdAndDelete(id)
+        .then(() => {
+            res.status(204).end();
+        })
+        .catch(error => next(error)); // Pass error to the error handler
 });
 
-// MIDDLEWARE for unknown endpoints
+/* MIDDLEWARE (POST ROUTES) */
 const unknownEndpoint = (req, res) => {
     res.status(404).send({ error: "Unknown endpoint" });
 };
 app.use(unknownEndpoint);
 
+const errorHandler = (error, req, res, next) => {
+    console.error(error.message);
+
+    if (error.name === "CastError") {
+        return res.status(400).send({ error: "Malformed ID" });
+    }
+
+    next(error);
+}
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
