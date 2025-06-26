@@ -74,17 +74,15 @@ app.get("/api/persons/:id", (req, res) => {
 // POST
 app.post("/api/persons", (req, res, next) => {
     const body = req.body;
-    if (!body.name || !body.number) {
+
+    const { name, number } = body;
+    if (!name || !number) {
         return res.status(400).json({ error: "Name or number is missing" });
     }
 
-    /* if (persons.some(person => person.name === body.name)) {
-        return res.status(400).json({ error: "Name must be unique" });
-    } */
-
     const newPerson = Person({
-        name: body.name,
-        number: body.number,
+        name: name,
+        number: number,
     })
     
     newPerson.save()
@@ -93,6 +91,32 @@ app.post("/api/persons", (req, res, next) => {
         })
         .catch(error => next(error)); // Pass error to the error handler
 });
+
+// PUT
+app.put("/api/persons/:id", (req, res, next) => {
+    const id = req.params.id;
+    const body = req.body;
+
+    const { name, number } = body;
+    if (!name || !number) {
+        return res.status(400).json({ error: "Name or number is missing" });
+    }
+
+    const person = {
+        name: name,
+        number: number,
+    };
+
+    // Find the person by ID and update it, returning the updated document (new:true)
+    Person.findByIdAndUpdate(id, person, { new:true })
+        .then(updatedPerson => {
+            if (!updatedPerson) {
+                return res.status(404).send({ error: "Person not found" });
+            }
+            res.json(updatedPerson);
+        })
+        .catch(error => next(error)); // Pass error to the error handler
+})
 
 // DELETE
 app.delete("/api/persons/:id", (req, res, next) => {
