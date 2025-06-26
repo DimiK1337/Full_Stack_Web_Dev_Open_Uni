@@ -1,10 +1,5 @@
-
+require('dotenv').config(); // Load environment variables from .env file
 const mongoose = require('mongoose');
-
-if (process.argv.length < 3) {
-    console.log('Please provide the password and note content as arguments: node mongo.js <password> <name> <number>');
-    process.exit(1);
-}
 
 const password = process.argv[2];
 const name = process.argv[3] || null;

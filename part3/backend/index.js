@@ -1,3 +1,4 @@
+require('dotenv').config(); // Load environment variables from .env file
 const express = require('express');
 const app = express();
 
@@ -18,53 +19,78 @@ app.use(morgan(":method :url :status :res[content-length] - :response-time ms :b
 
 app.use(express.static('dist'))
 
+/* MongoDB */
+
+const Note = require('./models/note'); // Import Note model 
+
+/* ENDPOINT ROUTES */
 
 // GET 
-app.get('/', (req, res) => {
-    res.send('<h1>Hello World!</h1>');
-});
 
 app.get('/api/notes', (req, res) => {
-    res.json(notes);
+    //res.json(notes);
+    Note.find({})
+        .then(notes => {
+            res.json(notes)
+        })
+        .catch(error => {
+            console.error('Error fetching notes:', error);
+            res.status(500).send({ error: 'Failed to fetch notes' });
+        });
 });
 
 app.get('/api/notes/:id', (req, res) => {
     const id = req.params.id;
-    const note = notes.find(note => note.id === id);
-    if (note) {
-        res.json(note);
-    } else {
-        res.status(404).send({ error: `Note with id ${id} not found` });
-    }
+    Note.findById(id)
+        .then(note => {
+            if (note) {
+                res.json(note);
+            }
+            else {
+                res.status(404).send({ error: 'Note not found' });
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching note:', error);
+            res.status(500).send({ error: 'Note not found' });
+        });
 });
 
 // POST
-
-const generateId = () => {
-    const maxId = notes.length > 0 ? Math.max(...notes.map(note => parseInt(note.id))) : 0;
-    return String(maxId + 1);
-};
-
 app.post('/api/notes', (req, res) => {
     const body = req.body;
     if (!body.content) {
         return res.status(400).json({ error: 'Content is missing' });
     }
-    const note = {
-        id: generateId(),
+    const note = new Note({
         content: body.content,
         important: body.important || false
-    };
-    notes = notes.concat(note);
-    console.log('Received note:', note);
-    res.json(note);
+    });
+
+    note.save()
+        .then(savedNote => {
+            res.status(201).json(savedNote);
+        })
+        .catch(error => {
+            console.error('Error saving note:', error);
+            res.status(500).send({ error: 'Failed to save note' });
+        });
+    
 });
 
 // DELETE
 app.delete('/api/notes/:id', (req, res) => {
     const id = req.params.id;
-    notes = notes.filter(note => note.id !== id);
-    res.status(204).end();
+    /* notes = notes.filter(note => note.id !== id);
+    res.status(204).end(); */
+    Note.findByIdAndDelete(id)
+        .then(() => {
+            res.status(204).end();
+        })
+        .catch(error => {
+            console.error('Error deleting note:', error);
+            res.status(500).send({ error: 'Failed to delete note' });
+        });
 });
 
 const PORT = process.env.PORT || 3001;
