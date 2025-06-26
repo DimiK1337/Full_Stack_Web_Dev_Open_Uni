@@ -1,21 +1,21 @@
 
-require('dotenv').config();
-const mongoose = require('mongoose');
+require('dotenv').config()
+const mongoose = require('mongoose')
 
 const url = `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@cluster0.xlabd.mongodb.net/noteApp?retryWrites=true&w=majority&appName=Cluster0`
 
-console.log(`Connecting to MongoDB at ${url}`);
+console.log(`Connecting to MongoDB at ${url}`)
 
-mongoose.set('strictQuery', false);
+mongoose.set('strictQuery', false)
 
 mongoose.connect(url)
 
 const noteSchema = new mongoose.Schema({
-    content: String,
-    important: Boolean,
+  content: String,
+  important: Boolean,
 })
 
-const Note = mongoose.model('Note', noteSchema);
+const Note = mongoose.model('Note', noteSchema)
 
 /* const note = new Note({
     content: 'HTML is easy',
@@ -47,10 +47,10 @@ mongoose.connection.close();
 }); */
 
 Note.find({ important: true }).then(result => {
-    console.log('notes:');
-    result.forEach(note => {
-        console.log(note);
-    });
-    mongoose.connection.close();
+  console.log('notes:')
+  result.forEach(note => {
+    console.log(note)
+  })
+  mongoose.connection.close()
 })
 
