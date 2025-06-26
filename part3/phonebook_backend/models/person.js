@@ -18,7 +18,15 @@ const personSchema = new mongoose.Schema({
         type: String,
         minLength: 3
     },
-    number: String,
+    number: {
+        required: true,
+        type: String,
+        minLength: 8,
+        set: v => v.replace(/\s+/g, '' ), // Remove any whitespace from the number (there shouldn't be any in the first place) using Regex validation
+        validate: {
+            validator: (val) => /\d{2,3}-\d{5,}/g.test(val)
+        }
+    },
 })
 
 personSchema.set('toJSON', {
