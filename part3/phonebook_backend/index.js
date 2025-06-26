@@ -75,27 +75,29 @@ app.get("/api/persons/:id", (req, res) => {
 });
 
 // POST
-const generateId = () => {
-    return Math.floor(Math.random() * 10000).toString();
-};
-
 app.post("/api/persons", (req, res) => {
     const body = req.body;
     if (!body.name || !body.number) {
         return res.status(400).json({ error: "Name or number is missing" });
     }
 
-    if (persons.some(person => person.name === body.name)) {
+    /* if (persons.some(person => person.name === body.name)) {
         return res.status(400).json({ error: "Name must be unique" });
-    }
+    } */
 
-    const newPerson = {
-        id: generateId(),
+    const newPerson = Person({
         name: body.name,
         number: body.number,
-    };
-    persons = persons.concat(newPerson);
-    res.status(201).json(newPerson);
+    })
+    
+    newPerson.save()
+        .then(savedPerson => {
+            res.status(201).json(savedPerson);
+        })
+        .catch(error => {
+            console.error("Error saving person:", error);
+            res.status(500).send({ error: "Failed to save person" });
+        })
 });
 
 // DELETE
