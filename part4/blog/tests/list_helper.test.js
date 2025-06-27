@@ -105,5 +105,9 @@ describe('most blogs', () => {
     }
     assert.deepStrictEqual(result, expected)
   })
+
+  test('returns an empty object for an empty of array of blogs', () => {
+    assert.deepStrictEqual(listHelper.mostBlogs([]), {})
+  })
 })
 
