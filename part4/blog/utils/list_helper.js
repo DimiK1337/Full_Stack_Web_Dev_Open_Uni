@@ -37,6 +37,31 @@ const mostBlogs = blogs => {
       }
     }
   }
+
+  return {}
+}
+
+const mostLikes = blogs => {
+  // Find the author with the most likes 
+  if (!blogs || blogs.length === 0) return {}
+
+  const reducer = (accumulatedLikesMap, blog) => ({
+    ...accumulatedLikesMap,
+    [blog.author]: (accumulatedLikesMap[blog.author] || 0) + blog.likes
+  })
+
+  const likesMap = blogs.reduce(reducer, {})
+
+  const highestLikeCount = Math.max(...Object.values(likesMap))
+  for (const [author, count] of Object.entries(likesMap)){
+    if (count === highestLikeCount) {
+      return {
+        author: author,
+        likes: count
+      }
+    }
+  }
+
   return {}
 }
 
@@ -44,5 +69,6 @@ module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
-  mostBlogs
+  mostBlogs,
+  mostLikes
 }
