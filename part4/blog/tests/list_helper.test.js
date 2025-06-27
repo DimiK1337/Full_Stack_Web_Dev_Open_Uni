@@ -35,7 +35,7 @@ const listWithManyBlogs = [
   {
     _id: '5a422aa71b54a676234d17f8',
     title: 'Go To Statement Considered Harmful',
-    author: 'Edsger W. Dijkstra',
+    author: 'Chad San',
     url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
     likes: 0,
     __v: 0
@@ -93,6 +93,17 @@ describe('favorite blog', () => {
   test('when the blog list is empty, returns empty object', () => {
     const result = listHelper.favoriteBlog([])
     assert.deepStrictEqual(result, {})
+  })
+})
+
+describe('most blogs', () => {
+  test('returns the author with the most blogs', () => {
+    const result = listHelper.mostBlogs(listWithManyBlogs)
+    const expected = {
+      author: "Tori Black",
+      blogs: 3
+    }
+    assert.deepStrictEqual(result, expected)
   })
 })
 
