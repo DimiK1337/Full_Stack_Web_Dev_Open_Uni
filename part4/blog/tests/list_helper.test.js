@@ -1,5 +1,6 @@
 const { test, describe } = require('node:test')
 const assert = require('node:assert')
+const _ = require('lodash')
 
 const listHelper = require('../utils/list_helper')
 
@@ -28,7 +29,7 @@ const listWithManyBlogs = [
     title: 'Go To Statement Considered Harmful',
     author: 'Edsger W. Dijkstra',
     url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
-    likes: 15,
+    likes: 159,
     __v: 0
   },
   {
@@ -42,7 +43,23 @@ const listWithManyBlogs = [
   {
     _id: '5a422aa71b54a676234d17f8',
     title: 'Go To Statement Considered Harmful',
-    author: 'Edsger W. Dijkstra',
+    author: 'Tori Black',
+    url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+    likes: 10,
+    __v: 0
+  },
+  {
+    _id: '5a422aa71b54a676234d17f8',
+    title: 'My life as a porn star',
+    author: 'Tori Black',
+    url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+    likes: 69,
+    __v: 0
+  },
+  {
+    _id: '5a422aa71b54a676234d17f8',
+    title: 'Go To Statement Considered Harmful',
+    author: 'Tori Black',
     url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
     likes: 10,
     __v: 0
@@ -57,7 +74,7 @@ describe('total likes', () => {
 
   test('when list with many blogs return the total sum of likes', () => {
     const result = listHelper.totalLikes(listWithManyBlogs)
-    assert.strictEqual(result, 30)
+    assert.strictEqual(result, 253)
   })
 
   test('when empty list return 0', () => {
@@ -68,15 +85,14 @@ describe('total likes', () => {
 
 describe('favorite blog', () => {
   test('returns the blog with the highest likes', () => {
-    const expected = {
-      _id: '5a422aa71b54a676234d17f8',
-      title: 'Go To Statement Considered Harmful',
-      author: 'Edsger W. Dijkstra',
-      url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
-      likes: 15,
-      __v: 0
-    }
+    const expected = _.maxBy(listWithManyBlogs, 'likes')
     const result = listHelper.favoriteBlog(listWithManyBlogs)
     assert.deepStrictEqual(result, expected) // Ignores references and only focuses on value equality
   })
+
+  test('when the blog list is empty, returns empty object', () => {
+    const result = listHelper.favoriteBlog([])
+    assert.deepStrictEqual(result, {})
+  })
 })
+
