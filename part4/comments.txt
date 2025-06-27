@@ -1,0 +1,2 @@
+The exercises for part 4 are in part4/blog and part4/blog
+The course demo code (not exercises) for part 4 are in part4/backend and part4/frontend
