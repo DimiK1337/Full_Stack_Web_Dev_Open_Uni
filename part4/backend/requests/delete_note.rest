@@ -1,0 +1,11 @@
+GET http://localhost:3001/api/notes
+
+###
+
+DELETE http://localhost:3001/api/notes/685d53d2a7b9e089d332b190
+Content-Type: application/json
+
+{
+    "content": "This note was updated using a PUT request in VSC REST",
+    "important": true
+}
