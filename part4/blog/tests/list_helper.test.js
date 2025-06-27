@@ -47,8 +47,6 @@ const listWithManyBlogs = [
     likes: 10,
     __v: 0
   }
-
-
 ]
 
 describe('total likes', () => {
@@ -66,5 +64,19 @@ describe('total likes', () => {
     const result = listHelper.totalLikes([])
     assert.strictEqual(result, 0)
   })
+})
 
+describe('favorite blog', () => {
+  test('returns the blog with the highest likes', () => {
+    const expected = {
+      _id: '5a422aa71b54a676234d17f8',
+      title: 'Go To Statement Considered Harmful',
+      author: 'Edsger W. Dijkstra',
+      url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+      likes: 15,
+      __v: 0
+    }
+    const result = listHelper.favoriteBlog(listWithManyBlogs)
+    assert.deepStrictEqual(result, expected) // Ignores references and only focuses on value equality
+  })
 })
