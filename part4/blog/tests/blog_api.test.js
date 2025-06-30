@@ -50,6 +50,29 @@ test('all blog posts have a property `id`', async () => {
   })
 })
 
+test('a valid blog can be added to the database', async () => {
+  const newBlog =   {
+    title: 'Is Java the tenth circle of hell? Screw over your colleague and suggest it for the frontend',
+    author: 'Tori Black',
+    url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+    likes: 10
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  // Get the blogs from the db and confirm the newly added blog is there
+  const blogs = await helper.blogsInDB()
+  assert(blogs.length, helper.listWithManyBlogs.length + 1)
+
+  // Check if the title of the new blog is in the returned blogs
+  const titles = blogs.map(blog => blog.title)
+  assert(titles.includes(newBlog.title))
+})
+
 
 after(async () => {
   await mongoose.connection.close()
