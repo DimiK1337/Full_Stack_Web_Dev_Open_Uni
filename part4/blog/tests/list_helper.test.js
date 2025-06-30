@@ -100,7 +100,7 @@ describe('most blogs', () => {
   test('returns the author with the most blogs', () => {
     const result = listHelper.mostBlogs(listWithManyBlogs)
     const expected = {
-      author: "Tori Black",
+      author: 'Tori Black',
       blogs: 3
     }
     assert.deepStrictEqual(result, expected)
@@ -115,7 +115,7 @@ describe('most likes', () => {
   test('returns the author with the most likes', () => {
     const result = listHelper.mostLikes(listWithManyBlogs)
     const expected = {
-      author: "Edsger W. Dijkstra",
+      author: 'Edsger W. Dijkstra',
       likes: 164
     }
     assert.deepStrictEqual(result, expected)

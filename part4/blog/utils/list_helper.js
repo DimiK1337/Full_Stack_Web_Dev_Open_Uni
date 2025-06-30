@@ -24,7 +24,7 @@ const mostBlogs = blogs => {
     ...accumulatedAuthorCounts,
 
     // The syntax [..] defines a key in an object, needed since a key is being made from another key
-    [blog.author]: (accumulatedAuthorCounts[blog.author] || 0) + 1 
+    [blog.author]: (accumulatedAuthorCounts[blog.author] || 0) + 1
   })
   const authorCounts = blogs.reduce(reducer, {})
 
@@ -42,7 +42,7 @@ const mostBlogs = blogs => {
 }
 
 const mostLikes = blogs => {
-  // Find the author with the most likes 
+  // Find the author with the most likes
   if (!blogs || blogs.length === 0) return {}
 
   const reducer = (accumulatedLikesMap, blog) => ({

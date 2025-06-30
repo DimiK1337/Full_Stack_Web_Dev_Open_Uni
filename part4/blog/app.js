@@ -16,7 +16,7 @@ mongoose.connect(mongoUrl)
     logger.info(`connected to mongo at URL:${mongoUrl}`)
   })
   .catch(error => {
-    logger.error("mongo db conn error", error)
+    logger.error('mongo db conn error', error)
   })
 
 app.use(express.json())
