@@ -1,0 +1,31 @@
+POST http://localhost:3001/api/login
+Content-Type: application/json
+
+{
+    "username": "JHC",
+    "password": "yomama"
+}
+
+###
+
+GET http://localhost:3001/api/users
+
+###
+
+POST http://localhost:3001/api/notes
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkpIQyIsImlkIjoiNjg2MjliMGI0YWFkYjMxNmNhNmIyZDkyIiwiaWF0IjoxNzUxMjk2ODcxLCJleHAiOjE3NTEzMDA0NzF9.2UaNwfzjbPCn-3G5tnzta36BRAe41mpcXWtvALC__BE
+
+{
+    "content": "YET AGAIN Logged in with JWT",
+    "important": true,
+    "userId": "68629acc4aadb316ca6b2d8c"
+}
+
+###
+
+GET http://localhost:3001/api/notes
+
+###
+
+GET http://localhost:3001/api/users

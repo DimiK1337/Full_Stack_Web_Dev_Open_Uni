@@ -1,0 +1,23 @@
+GET http://localhost:3001/api/users
+
+
+###
+
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+    "name": "GOD's son",
+    "username": "JHC",
+    "password": "yomama"
+}
+
+###
+
+POST http://localhost:3001/api/login
+Content-Type: application/json
+
+{
+    "username": "JHC",
+    "password": "yomama"
+}
