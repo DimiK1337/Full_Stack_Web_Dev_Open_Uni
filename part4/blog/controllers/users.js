@@ -13,10 +13,18 @@ userRouter.get('/', async (req, res) => {
 userRouter.post('/', async (req, res) => {
   const { name, username, password } = req.body
 
+  if (!username || !password) {
+    return res.status(400).json({ error: 'username or password missing'})
+  }
+
   const isDuplicateUser = await User.findOne({ username })
 
   if (isDuplicateUser) {
-    return res.status(400).json({ error: 'username must be unique' })
+    return res.status(400).json({ error: 'expected username to be unique' })
+  }
+
+  if (username.length < 3 || password.length < 3) {
+    return res.status(400).json({ error: 'username and password must be at least 3 characters long' })
   }
 
   const saltRounds = 10
