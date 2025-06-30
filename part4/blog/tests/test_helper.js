@@ -2,7 +2,7 @@ const Blog = require('../models/blog')
 
 const listWithOneBlog = [
   {
-    title: 'Go To Statement Considered Harmful',
+    title: '0 Go To Statement Considered Harmful',
     author: 'Edsger W. Dijkstra',
     url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
     likes: 5,
@@ -12,19 +12,19 @@ const listWithOneBlog = [
 const listWithManyBlogs = [
   ...listWithOneBlog,
   {
-    title: 'Go To Statement Considered Harmful',
+    title: '1 Go To Statement Considered Harmful',
     author: 'Edsger W. Dijkstra',
     url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
     likes: 159,
   },
   {
-    title: 'Go To Statement Considered Harmful',
+    title: '2 Go To Statement Considered Harmful',
     author: 'Chad San',
     url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
     likes: 0,
   },
   {
-    title: 'Go To Statement Considered Harmful',
+    title: '3 Go To Statement Considered Harmful',
     author: 'Tori Black',
     url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
     likes: 10,
@@ -36,7 +36,7 @@ const listWithManyBlogs = [
     likes: 69,
   },
   {
-    title: 'Go To Statement Considered Harmful',
+    title: '4 Go To Statement Considered Harmful',
     author: 'Tori Black',
     url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
     likes: 10,
@@ -48,8 +48,14 @@ const blogsInDB = async () => {
   return blogs.map(blog => blog.toJSON())
 }
 
+const createNewBlog = async () => {
+  const savedBlog = await Blog(listWithManyBlogs[4]).save()
+  return savedBlog.toJSON()
+}
+
 module.exports = {
   listWithOneBlog,
   listWithManyBlogs,
-  blogsInDB
+  blogsInDB,
+  createNewBlog
 }
