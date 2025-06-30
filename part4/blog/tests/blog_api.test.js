@@ -145,6 +145,22 @@ describe('when there are some initial blogs saved', () => {
     })
   })
 
+  describe('when updating a blog from the db', () => {
+    test('the number of likes is updated', async () => {
+      const blogsAtStart = await helper.blogsInDB()
+      const blogToUpdate = blogsAtStart[0]
+      const updatedFields = {
+        likes: 9999
+      }
+
+      const updatedBlog = await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send(updatedFields)
+        .expect(200)
+
+      assert(updatedBlog.body.likes, updatedFields.likes)
+    })
+  })
 })
 
 

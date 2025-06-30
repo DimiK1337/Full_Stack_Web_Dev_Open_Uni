@@ -2,10 +2,12 @@ GET http://localhost:3003/api/blogs
 
 ###
 
-DELETE http://localhost:3003/api/blogs/685d6828979f4f18f570bdad
+PUT http://localhost:3003/api/blogs/686288917cdb74a2c0f03d62
 Content-Type: application/json
 
 {
-    "content": "This note was updated using a PUT request in VSC REST",
-    "important": true
+    "title": "My 2nd blog (updated title and more)",
+    "author": "yo mama",
+    "url": "String",
+    "likes": 1337
 }
