@@ -1,3 +1,5 @@
+// This needs to be at the top of the file to remove the need for try/catch (middleware is handlded under the hood)
+require('express-async-errors')
 
 const express = require('express')
 const mongoose = require('mongoose')

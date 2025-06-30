@@ -73,6 +73,26 @@ test('a valid blog can be added to the database', async () => {
   assert(titles.includes(newBlog.title))
 })
 
+test('a blog with the missing `likes` property will default to 0', async () => {
+  const newBlog =   {
+    title: 'Is Java the tenth circle of hell? Screw over your colleague and suggest it for the frontend',
+    author: 'Tori Black',
+    url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const blogs = await helper.blogsInDB()
+  const mostRecentBlog = blogs[blogs.length - 1]
+
+  assert(Object.hasOwn(mostRecentBlog, 'likes'))
+  assert.strictEqual(mostRecentBlog.likes, 0)
+
+})
 
 after(async () => {
   await mongoose.connection.close()
