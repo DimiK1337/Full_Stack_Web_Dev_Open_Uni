@@ -42,6 +42,14 @@ test('returns blog with a predefined title', async () => {
   assert(blogs.includes('My life as a porn star'))
 })
 
+test('all blog posts have a property `id`', async () => {
+  const res = await api.get('/api/blogs')
+  const blogs = res.body.map(blog => blog)
+  blogs.forEach(blog => {
+    assert.ok(blog.id)
+  })
+})
+
 
 after(async () => {
   await mongoose.connection.close()
