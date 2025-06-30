@@ -294,6 +294,33 @@ describe('when there is initially one user in db', () => {
 
   })
 
+  describe('when a blog is created', () => {
+    test('the user property in the blog schema is populated', async () => {
+      const newBlog = {
+        title: 'Is Java the tenth circle of hell? Screw over your colleague and suggest it for the frontend',
+        author: 'Tori Black',
+        url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+        likes: 10
+      }
+
+      const response = await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+      const savedBlog = response.body
+
+      // Get the blogs from the db and confirm the newly added blog is there
+      const blogs = await helper.blogsInDB()
+      assert(blogs.length, helper.listWithManyBlogs.length + 1)
+
+      assert(Object.hasOwn(savedBlog, 'user'))
+
+    })
+
+  })
+
 })
 
 

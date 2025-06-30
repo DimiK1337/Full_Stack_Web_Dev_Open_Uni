@@ -1,9 +1,12 @@
 const blogRouter = require('express').Router()
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 
 blogRouter.get('/', async (request, response) => {
-  const blogs = await Blog.find({})
+  const blogs = await Blog
+    .find({})
+    .populate('user')
   response.json(blogs)
 })
 
@@ -18,14 +21,25 @@ blogRouter.post('/', async (request, response) => {
     return response.status(400).send({ error: 'Missing url from blog' })
   }
 
+  const user = await User.findOne() // Find any random user atm
+
+  if (!user) {
+    return response.status(400).json({ error: 'missing userId' })
+  }
+
   const blog = new Blog({
     title: body.title,
     author: body.author,
     url: body.url,
-    likes: body.likes || 0
+    likes: body.likes || 0,
+    user: user._id
   })
 
   const savedBlog = await blog.save()
+
+  user.blogs = user.blogs.concat(savedBlog._id)
+
+  await user.save()
   response.status(201).json(savedBlog)
 })
 

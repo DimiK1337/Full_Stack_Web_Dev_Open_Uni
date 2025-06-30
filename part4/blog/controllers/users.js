@@ -5,7 +5,7 @@ const User = require('../models/user')
 
 userRouter.get('/', async (req, res) => {
   const users = await User.find({})
-    .populate('blogs', { title: 1 }) // Only get the titles when displaying users
+    .populate('blogs')
 
   res.json(users)
 })
@@ -14,7 +14,7 @@ userRouter.post('/', async (req, res) => {
   const { name, username, password } = req.body
 
   if (!username || !password) {
-    return res.status(400).json({ error: 'username or password missing'})
+    return res.status(400).json({ error: 'username or password missing' })
   }
 
   const isDuplicateUser = await User.findOne({ username })
