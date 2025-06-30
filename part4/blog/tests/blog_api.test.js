@@ -91,7 +91,36 @@ test('a blog with the missing `likes` property will default to 0', async () => {
 
   assert(Object.hasOwn(mostRecentBlog, 'likes'))
   assert.strictEqual(mostRecentBlog.likes, 0)
+})
 
+test('a blog missing the `title` property will send a 400 BAD REQUEST', async () => {
+  const newBlog =   {
+    author: 'Tori Black',
+    url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf'
+  }
+
+  const res = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+    .expect('Content-Type', /application\/json/)
+
+  assert(res.error.text.includes('Missing title from blog'))
+})
+
+test('a blog missing the `url` property will send a 400 BAD REQUEST', async () => {
+  const newBlog =   {
+    title: 'Is Java the tenth circle of hell? Screw over your colleague and suggest it for the frontend',
+    author: 'Tori Black'
+  }
+
+  const res = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+    .expect('Content-Type', /application\/json/)
+
+  assert(res.error.text.includes('Missing url from blog'))
 })
 
 after(async () => {
