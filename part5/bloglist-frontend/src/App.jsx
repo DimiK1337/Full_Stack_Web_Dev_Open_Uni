@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 
 import Blog from './components/Blog'
+import CreateNewBlog from './components/CreateNewBlog'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 
@@ -13,6 +14,7 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -59,6 +61,12 @@ const App = () => {
     setPassword('')
   }
 
+  const addBlogToList = (newBlog) => {
+    console.log('Adding new blog', newBlog);
+    setBlogs(blogs.concat(newBlog))
+    //setBlogs(prevBlogs => prevBlogs.concat(newBlog))
+  }
+
   const loginFormProps = {
     username,
     password,
@@ -73,6 +81,9 @@ const App = () => {
         <h2>blogs</h2>
         <p>{user.name} is logged in</p>
         <button onClick={handleLogout}>logout</button>
+        
+        <CreateNewBlog addBlogToList={addBlogToList} />
+        <br />
         {
           blogs.map(blog =>
             <Blog key={blog.id} blog={blog} />
@@ -81,7 +92,6 @@ const App = () => {
       </>
     )
   }
-
 
   return (
     <div>

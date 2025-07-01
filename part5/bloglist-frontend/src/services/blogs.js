@@ -12,8 +12,18 @@ const getAll = () => {
   return request.then(response => response.data)
 }
 
+const createBlog = async (blogObject) => {
+  const config = {
+    headers: {
+      authorization: token
+    }
+  }
+  const res = await axios.post(baseUrl, blogObject, config)
+  return res.data
+}
+
 export default { 
   getAll,
-
+  createBlog,
   setToken
 }
