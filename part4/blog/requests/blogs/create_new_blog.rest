@@ -16,10 +16,10 @@ Content-Type: application/json
 
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY4NjNjNjZmMmVjMWFhNzg3NzQxYjQ0MyIsImlhdCI6MTc1MTM3MDE2MiwiZXhwIjoxNzUxMzczNzYyfQ.CDelpA_RQ9CqlZv5ppFWYChVW5NWQu5XslLjZ7mDdRo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY4NjNjNjZmMmVjMWFhNzg3NzQxYjQ0MyIsImlhdCI6MTc1MTM3NDg3NiwiZXhwIjoxNzUxMzc4NDc2fQ.ndN_8F7NiLL--VSCeJjcdvUaycklduLch5L7vCP3oHg
 
 {
-  "title": "MY FOURTH BLOG",
+  "title": "WHO KNOWS HOW LONG BLOG",
   "author": "ME",
   "url": "String",
   "likes": 69420
