@@ -2,9 +2,10 @@
 /**
  * This file handles all middleware in the project. The order of the middleware functions is important. The error handling must be used at the very end
  */
-
-const logger = require('../utils/logger')
 const morgan = require('morgan')
+const jwt = require('jsonwebtoken')
+const logger = require('../utils/logger')
+const User = require('../models/user')
 
 morgan.token('body', (req) => {
   return JSON.stringify(req.body)
@@ -16,6 +17,16 @@ const tokenExtractor = (req, res, next) => {
   req.token = (!auth || !auth.startsWith('Bearer '))
     ? null
     : auth.replace('Bearer ', '')
+  next()
+}
+
+const userExtractor = async (req, res, next) => {
+  // Find out who the user is based on the token
+  const decodedToken = jwt.verify(req.token, process.env.SECRET)
+  if (!decodedToken) return res.status(401).json({ error: 'invalid token' })
+  const user = await User.findById(decodedToken.id)
+  if (!user) return res.status(404).json({ error: 'user not found' })
+  req.user = user
   next()
 }
 
@@ -48,6 +59,7 @@ const errorHandler = (error, req, res, next) => {
 module.exports = {
   requestLogger,
   tokenExtractor,
+  userExtractor,
   unknownEndpoint,
   errorHandler
 }

@@ -1,5 +1,8 @@
 const jwt = require('jsonwebtoken')
 const blogRouter = require('express').Router()
+
+const middleware = require('../utils/middleware')
+
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
@@ -10,7 +13,7 @@ blogRouter.get('/', async (request, response) => {
   response.json(blogs)
 })
 
-blogRouter.post('/', async (request, response) => {
+blogRouter.post('/', middleware.userExtractor, async (request, response) => {
   const body = request.body
 
   if (!body.title) {
@@ -21,17 +24,7 @@ blogRouter.post('/', async (request, response) => {
     return response.status(400).send({ error: 'Missing url from blog' })
   }
 
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'invalid token' })
-  }
-
-  const user = await User.findById(decodedToken.id)
-
-  if (!user) {
-    return response.status(400).json({ error: 'missing userId' })
-  }
+  const user = request.user
 
   const blog = new Blog({
     title: body.title,
@@ -49,29 +42,18 @@ blogRouter.post('/', async (request, response) => {
   response.status(201).json(savedBlog)
 })
 
-blogRouter.delete('/:id', async (request, response) => {
+blogRouter.delete('/:id', middleware.userExtractor, async (request, response) => {
   const { id } = request.params
 
-  // Get the token of the user who made the blog
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'invalid token' })
-  }
-
-  const user = await User.findById(decodedToken.id)
-
-  if (!user) {
-    return response.status(400).json({ error: 'missing userId' })
-  }
+  const user = request.user
 
   // Check that the blog belongs to the user
   const foundBlog = await Blog.findById(id)
-  if (!foundBlog || !foundBlog.user) {
+  if (!foundBlog) {
     return response.status(404).json({ error: 'blog not found' })
   }
 
-  if (foundBlog.user.toString() !== decodedToken.id) {
+  if (!foundBlog.user || foundBlog.user.toString() !== user._id.toString()) {
     return response.status(403).json({ error: 'unauthorized action' })
   }
 
