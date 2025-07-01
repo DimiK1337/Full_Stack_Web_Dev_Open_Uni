@@ -30,6 +30,9 @@ const errorHandler = (error, req, res, next) => {
   if (error.name === 'JsonWebTokenError') {
     return res.status(401).json({ error: 'invalid token' })
   }
+  if (error.name === 'TokenExpiredError') {
+    return res.status(401).json({ error: 'token expired' })
+  }
   next(error) // Pass the error to the default express error handler middleware
 }
 
