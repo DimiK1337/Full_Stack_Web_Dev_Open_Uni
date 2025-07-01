@@ -6,7 +6,7 @@ const User = require('../models/user')
 blogRouter.get('/', async (request, response) => {
   const blogs = await Blog
     .find({})
-    .populate('user')
+    .populate('user', { username: 1, name: 1, id: 1 })
   response.json(blogs)
 })
 
@@ -50,8 +50,36 @@ blogRouter.post('/', async (request, response) => {
 })
 
 blogRouter.delete('/:id', async (request, response) => {
-  const id = request.params.id
+  const { id } = request.params
+
+  // Get the token of the user who made the blog
+  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'invalid token' })
+  }
+
+  const user = await User.findById(decodedToken.id)
+
+  if (!user) {
+    return response.status(400).json({ error: 'missing userId' })
+  }
+
+  // Check that the blog belongs to the user
+  const foundBlog = await Blog.findById(id)
+  if (!foundBlog || !foundBlog.user) {
+    return response.status(404).json({ error: 'blog not found' })
+  }
+
+  if (foundBlog.user.toString() !== decodedToken.id) {
+    return response.status(403).json({ error: 'unauthorized action' })
+  }
+
   await Blog.findByIdAndDelete(id)
+
+  // Update the referenced blog IDs in the user document to not include the deleted blog
+  user.blogs = user.blogs.filter(blogID => blogID.toString() !== id)
+  await user.save()
   response.status(204).end()
 })
 
