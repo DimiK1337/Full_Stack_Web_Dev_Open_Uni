@@ -19,12 +19,21 @@ const App = () => {
   const [user, setUser] = useState(null)
 
 
-  const hook = () => {
+  const getInitialNotesHook = () => {
     noteService
       .getAll()
       .then((initialNotes) => setNotes(initialNotes))
   }
-  useEffect(hook, [])
+  useEffect(getInitialNotesHook, [])
+
+  const getTokenFromLocalStorageHook = () => {
+    const loggedinJSON = window.localStorage.getItem('loggedNoteappUser')
+    if (!loggedinJSON) return
+    const user = JSON.parse(loggedinJSON)
+    setUser(user)
+    noteService.setToken(user.token)
+  }
+  useEffect(getTokenFromLocalStorageHook, [])
 
   console.log('render', notes.length, 'notes')
 
@@ -76,6 +85,8 @@ const App = () => {
 
     try {
       const user = await loginService.login({ username, password })
+
+      window.localStorage.setItem('loggedNoteappUser', JSON.stringify(user))
       noteService.setToken(user.token)
       setUser(user)
       setUsername(username)
@@ -87,6 +98,14 @@ const App = () => {
         setErrorMessage(null)
       }, 5000)
     }
+  }
+
+  const handleLogout = event => {
+    window.localStorage.removeItem('loggedNoteappUser')
+    noteService.setToken('')
+    setUser(null)
+    setUsername('')
+    setPassword('')
   }
 
   const noteForm = () => (
@@ -110,12 +129,15 @@ const App = () => {
       <Notification message={errorMessage} />
 
       {
-        user === null 
-        ? <LoginForm {...loginFormProps} /> : 
-        <div>
-          <p>{user.username} is logged in</p>
-          {noteForm()}
-        </div>
+        user === null
+          ? <LoginForm {...loginFormProps} /> :
+          <div>
+            <p>{user.username} is logged in</p>
+            <button onClick={handleLogout}>
+              logout
+            </button>
+            {noteForm()}
+          </div>
       }
 
       <div>
