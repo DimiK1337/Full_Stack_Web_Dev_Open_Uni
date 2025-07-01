@@ -20,7 +20,7 @@ userRouter.post('/', async (req, res) => {
   const isDuplicateUser = await User.findOne({ username })
 
   if (isDuplicateUser) {
-    return res.status(400).json({ error: 'expected username to be unique' })
+    return res.status(400).json({ error: 'expected `username` to be unique' })
   }
 
   if (username.length < 3 || password.length < 3) {

@@ -54,6 +54,23 @@ describe('when there are some initial blogs saved', () => {
 
   // POST
   describe('when adding a blog to the db', () => {
+    let token
+    beforeEach(async () => {
+      await User.deleteMany({})
+      const userCredentials = { username: 'root', password: 'sekret' }
+      const passwordHash = await bcrypt.hash(userCredentials.password, 10)
+      const user = new User({ username: userCredentials.username, passwordHash })
+
+      await user.save()
+
+      // login in the user
+      const loginRes = await api
+        .post('/api/login')
+        .send(userCredentials)
+
+      token = loginRes.body.token
+    })
+
     test('it will be added to the database', async () => {
       const newBlog = {
         title: 'Is Java the tenth circle of hell? Screw over your colleague and suggest it for the frontend',
@@ -64,6 +81,7 @@ describe('when there are some initial blogs saved', () => {
 
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -86,6 +104,7 @@ describe('when there are some initial blogs saved', () => {
 
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -105,6 +124,7 @@ describe('when there are some initial blogs saved', () => {
 
       const res = await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(400)
         .expect('Content-Type', /application\/json/)
@@ -120,6 +140,7 @@ describe('when there are some initial blogs saved', () => {
 
       const res = await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(400)
         .expect('Content-Type', /application\/json/)
@@ -147,6 +168,7 @@ describe('when there are some initial blogs saved', () => {
     })
   })
 
+  // PUT
   describe('when updating a blog from the db', () => {
     test('the number of likes is updated', async () => {
       const blogsAtStart = await helper.blogsInDB()
@@ -166,14 +188,21 @@ describe('when there are some initial blogs saved', () => {
 })
 
 describe('when there is initially one user in db', () => {
+  let token
   beforeEach(async () => {
     await User.deleteMany({})
-
-    const passwordHash = await bcrypt.hash('sekret', 10)
-    const user = new User({ username: 'root', passwordHash })
+    const userCredentials = { username: 'root', password: 'sekret' }
+    const passwordHash = await bcrypt.hash(userCredentials.password, 10)
+    const user = new User({ username: userCredentials.username, passwordHash })
 
     await user.save()
-    console.log('user with root has been saved')
+
+    // login in the user
+    const loginRes = await api
+      .post('/api/login')
+      .send(userCredentials)
+
+    token = loginRes.body.token
   })
 
   test('creation succeeds with a fresh username', async () => {
@@ -187,6 +216,7 @@ describe('when there is initially one user in db', () => {
 
     await api
       .post('/api/users')
+      .set('Authorization', `Bearer ${token}`)
       .send(newUser)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -200,7 +230,6 @@ describe('when there is initially one user in db', () => {
 
   test('creation fails with proper statuscode and message if username already taken', async () => {
     const usersAtStart = await helper.usersInDB()
-    console.log('users at start', usersAtStart)
 
     const newUser = {
       username: 'root',
@@ -215,7 +244,7 @@ describe('when there is initially one user in db', () => {
       .expect('Content-Type', /application\/json/)
 
     const usersAtEnd = await helper.usersInDB()
-    assert(result.body.error.includes('expected username to be unique'))
+    assert(result.body.error.includes('expected `username` to be unique'))
 
     assert.strictEqual(usersAtEnd.length, usersAtStart.length)
   })
@@ -305,6 +334,7 @@ describe('when there is initially one user in db', () => {
 
       const response = await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -318,9 +348,7 @@ describe('when there is initially one user in db', () => {
       assert(Object.hasOwn(savedBlog, 'user'))
 
     })
-
   })
-
 })
 
 
