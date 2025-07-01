@@ -27,7 +27,6 @@ const App = () => {
     if (!loggedInJSON) return 
     const user = JSON.parse(loggedInJSON)
     setUser(user)
-    console.log('user in effect', user)
     blogService.setToken(user.token)
 
   }, [])
@@ -45,7 +44,7 @@ const App = () => {
       setPassword(password)
     }
     catch (exception) {
-      setErrorMessage('Wrong credentials')
+      setErrorMessage({ message: 'Wrong credentials', type: 'error' })
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
@@ -62,9 +61,17 @@ const App = () => {
   }
 
   const addBlogToList = (newBlog) => {
-    console.log('Adding new blog', newBlog);
     setBlogs(blogs.concat(newBlog))
-    //setBlogs(prevBlogs => prevBlogs.concat(newBlog))
+    console.log('new blog', newBlog);
+    
+    setErrorMessage({
+      message: `Added a new blog titled '${newBlog.title}'`,
+      type: 'success'
+    })
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    
   }
 
   const loginFormProps = {
@@ -95,7 +102,7 @@ const App = () => {
 
   return (
     <div>
-      <Notification message={errorMessage} />
+      <Notification messageObj={errorMessage} />
       {
         user === null
           ? <LoginForm {...loginFormProps} />
