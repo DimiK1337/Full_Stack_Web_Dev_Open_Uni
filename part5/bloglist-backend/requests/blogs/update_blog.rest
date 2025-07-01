@@ -1,0 +1,13 @@
+GET http://localhost:3003/api/blogs
+
+###
+
+PUT http://localhost:3003/api/blogs/686288917cdb74a2c0f03d62
+Content-Type: application/json
+
+{
+    "title": "My 2nd blog (updated title and more)",
+    "author": "yo mama",
+    "url": "String",
+    "likes": 1337
+}
