@@ -18,7 +18,7 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  
+
   // Refs
   const blogFormRef = useRef()
 
@@ -30,7 +30,7 @@ const App = () => {
 
   useEffect(() => {
     const loggedInJSON = window.localStorage.getItem('loggedBlogappUser')
-    if (!loggedInJSON) return 
+    if (!loggedInJSON) return
     const user = JSON.parse(loggedInJSON)
     setUser(user)
     blogService.setToken(user.token)
@@ -70,17 +70,17 @@ const App = () => {
     setBlogs(blogs.concat(newBlog))
     console.log('new blog', newBlog)
     blogFormRef.current.toggleVisibility()
-    
+
     setErrorMessage({
       message: `Added a new blog titled '${newBlog.title}'`,
       type: 'success'
     })
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000) 
+    setTimeout(() => {
+      setErrorMessage(null)
+    }, 5000)
   }
 
-  const handleLikeClick = async (blogToUpdate) => {    
+  const handleLikeClick = async (blogToUpdate) => {
     const newBlog = { ...blogToUpdate, likes: blogToUpdate.likes + 1, user: blogToUpdate.user.id }
     const updatedBlog = await blogService.updateBlog(blogToUpdate.id, newBlog)
     setBlogs(blogs.map(blog => blog.id !== updatedBlog.id ? blog : updatedBlog))
@@ -103,15 +103,15 @@ const App = () => {
         <Togglable buttonLabel={'new blog'} ref={blogFormRef}>
           <BlogForm addBlogToList={addBlogToList} />
         </Togglable>
-        
+
         <br />
         {
-          blogs.sort((a,b) => b.likes - a.likes).map(blog =>
-            <Blog 
-              key={blog.id} 
-              blog={blog} 
+          blogs.sort((a, b) => b.likes - a.likes).map(blog =>
+            <Blog
+              key={blog.id}
+              blog={blog}
               user={user}
-              handleLikeClick={() => handleLikeClick(blog)} 
+              handleLikeClick={() => handleLikeClick(blog)}
               handleDelete={() => handleDelete(blog)}
             />
           )
@@ -126,13 +126,13 @@ const App = () => {
       {
         user === null
           ? <Togglable buttonLabel={'login'}>
-              <LoginForm
-                username={username}
-                password={password}
-                handleUsernameChange={({ target }) => setUsername(target.value)}
-                handlePasswordChange={({ target }) => setPassword(target.value)}
-                handleSubmit={handleLogin}
-              />
+            <LoginForm
+              username={username}
+              password={password}
+              handleUsernameChange={({ target }) => setUsername(target.value)}
+              handlePasswordChange={({ target }) => setPassword(target.value)}
+              handleSubmit={handleLogin}
+            />
           </Togglable>
           : blogDisplay()
       }

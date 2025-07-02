@@ -37,7 +37,7 @@ const deleteBlog = async id => {
   return res.data
 }
 
-export default { 
+export default {
   getAll,
   createBlog,
   updateBlog,

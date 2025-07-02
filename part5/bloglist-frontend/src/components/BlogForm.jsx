@@ -1,9 +1,9 @@
-import { useState } from "react"
+import PropTypes from 'prop-types'
+import { useState } from 'react'
 
-import blogService from "../services/blogs"
+import blogService from '../services/blogs'
 
-
-const CreateNewBlog = ({ addBlogToList }) => {
+const BlogForm = ({ addBlogToList }) => {
 
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
@@ -18,7 +18,7 @@ const CreateNewBlog = ({ addBlogToList }) => {
       setAuthor('')
       setUrl('')
     }
-    catch (error) { 
+    catch (error) {
       console.error('Error creating blog:', error)
     }
   }
@@ -36,10 +36,14 @@ const CreateNewBlog = ({ addBlogToList }) => {
         <div>
           url: <input value={url} onChange={({ target }) => setUrl(target.value)} />
         </div>
-        <button type="submit" onClick={handleCreate}>create</button>
+        <button type='submit' onClick={handleCreate}>create</button>
       </form>
     </>
   )
 }
 
-export default CreateNewBlog
+BlogForm.PropTypes = {
+  addBlogToList: PropTypes.func.isRequired
+}
+
+export default BlogForm
