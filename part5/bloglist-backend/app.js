@@ -23,6 +23,7 @@ mongoose.connect(mongoUrl)
     logger.error('mongo db conn error', error)
   })
 
+app.use(express.static('dist'))
 app.use(express.json())
 app.use(middleware.requestLogger)
 app.use(middleware.tokenExtractor)

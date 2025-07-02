@@ -1,20 +1,26 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
+import Togglable from './components/Togglable'
 import Blog from './components/Blog'
-import CreateNewBlog from './components/CreateNewBlog'
+import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
+
 
 import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
+
+  // State
   const [blogs, setBlogs] = useState([])
   const [errorMessage, setErrorMessage] = useState(null)
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   
+  // Refs
+  const blogFormRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -62,7 +68,8 @@ const App = () => {
 
   const addBlogToList = (newBlog) => {
     setBlogs(blogs.concat(newBlog))
-    console.log('new blog', newBlog);
+    console.log('new blog', newBlog)
+    blogFormRef.current.toggleVisibility()
     
     setErrorMessage({
       message: `Added a new blog titled '${newBlog.title}'`,
@@ -74,22 +81,16 @@ const App = () => {
     
   }
 
-  const loginFormProps = {
-    username,
-    password,
-    setPassword,
-    setUsername,
-    handleLogin
-  }
-
   const blogDisplay = () => {
     return (
       <>
         <h2>blogs</h2>
         <p>{user.name} is logged in</p>
         <button onClick={handleLogout}>logout</button>
+        <Togglable buttonLabel={'new blog'} ref={blogFormRef}>
+          <BlogForm addBlogToList={addBlogToList} />
+        </Togglable>
         
-        <CreateNewBlog addBlogToList={addBlogToList} />
         <br />
         {
           blogs.map(blog =>
@@ -105,7 +106,15 @@ const App = () => {
       <Notification messageObj={errorMessage} />
       {
         user === null
-          ? <LoginForm {...loginFormProps} />
+          ? <Togglable buttonLabel={'login'}>
+              <LoginForm
+                username={username}
+                password={password}
+                handleUsernameChange={({ target }) => setUsername(target.value)}
+                handlePasswordChange={({ target }) => setPassword(target.value)}
+                handleSubmit={handleLogin}
+              />
+          </Togglable>
           : blogDisplay()
       }
     </div>
