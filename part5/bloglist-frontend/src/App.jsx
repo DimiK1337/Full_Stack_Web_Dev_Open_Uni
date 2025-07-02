@@ -80,10 +80,18 @@ const App = () => {
       }, 5000) 
   }
 
-  const handleLikeClick = async (blog) => {    
-    const newBlog = { ...blog, likes: blog.likes + 1, user: blog.user.id }
-    const updatedBlog = await blogService.updateBlog(blog.id, newBlog)
+  const handleLikeClick = async (blogToUpdate) => {    
+    const newBlog = { ...blogToUpdate, likes: blogToUpdate.likes + 1, user: blogToUpdate.user.id }
+    const updatedBlog = await blogService.updateBlog(blogToUpdate.id, newBlog)
     setBlogs(blogs.map(blog => blog.id !== updatedBlog.id ? blog : updatedBlog))
+  }
+
+  // Handle delete
+  const handleDelete = async (blogToDelete) => {
+    const deleteOk = window.confirm(`delete blog ${blogToDelete.title}`)
+    if (!deleteOk) return
+    await blogService.deleteBlog(blogToDelete.id)
+    setBlogs(blogs.filter(blog => blogToDelete.id !== blog.id))
   }
 
   const blogDisplay = () => {
@@ -102,7 +110,9 @@ const App = () => {
             <Blog 
               key={blog.id} 
               blog={blog} 
+              user={user}
               handleLikeClick={() => handleLikeClick(blog)} 
+              handleDelete={() => handleDelete(blog)}
             />
           )
         }
