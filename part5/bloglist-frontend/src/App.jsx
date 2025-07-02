@@ -77,8 +77,13 @@ const App = () => {
     })
       setTimeout(() => {
         setErrorMessage(null)
-      }, 5000)
-    
+      }, 5000) 
+  }
+
+  const handleLikeClick = async (blog) => {    
+    const newBlog = { ...blog, likes: blog.likes + 1, user: blog.user.id }
+    const updatedBlog = await blogService.updateBlog(blog.id, newBlog)
+    setBlogs(blogs.map(blog => blog.id !== updatedBlog.id ? blog : updatedBlog))
   }
 
   const blogDisplay = () => {
@@ -94,7 +99,11 @@ const App = () => {
         <br />
         {
           blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} />
+            <Blog 
+              key={blog.id} 
+              blog={blog} 
+              handleLikeClick={() => handleLikeClick(blog)} 
+            />
           )
         }
       </>

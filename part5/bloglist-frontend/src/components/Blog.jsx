@@ -1,6 +1,8 @@
 import { useState } from "react"
 
-const Blog = ({ blog }) => {
+import blogsService from "../services/blogs"
+
+const Blog = ({ blog, handleLikeClick }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -24,7 +26,7 @@ const Blog = ({ blog }) => {
           <p>{blog.url}</p>
           <div>
             likes {blog.likes}
-            <button>like</button>
+            <button onClick={handleLikeClick}>like</button>
           </div>
           <p>{blog.author}</p>
         </div>
