@@ -65,6 +65,7 @@ const App = () => {
         )
       )
       .catch(error => {
+        console.error(error)
         setErrorMessage(`Note '${note.content}' was already removed from server`)
         setTimeout(() => {
           setErrorMessage(null)
@@ -87,6 +88,7 @@ const App = () => {
       setPassword(password)
     }
     catch (exception) {
+      console.error(exception)
       setErrorMessage('Wrong credentials')
       setTimeout(() => {
         setErrorMessage(null)
