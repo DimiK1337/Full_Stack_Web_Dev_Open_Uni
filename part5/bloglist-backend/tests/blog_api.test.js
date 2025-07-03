@@ -58,7 +58,7 @@ describe('when there are some initial blogs saved', () => {
       await User.deleteMany({})
       const userCredentials = { username: 'root', password: 'sekret' }
       const passwordHash = await bcrypt.hash(userCredentials.password, 10)
-      const user = new User({ username: userCredentials.username, passwordHash })
+      const user = new User({ username: userCredentials.username, passwordHash, name: 'Dimitriy Kruglikov' })
 
       await user.save()
 
@@ -222,7 +222,7 @@ describe('when there is initially one user in db', () => {
     await User.deleteMany({})
     const userCredentials = { username: 'root', password: 'sekret' }
     const passwordHash = await bcrypt.hash(userCredentials.password, 10)
-    const user = new User({ username: userCredentials.username, passwordHash })
+    const user = new User({ username: userCredentials.username, passwordHash, name: 'Dimitriy Kruglikov' })
 
     await user.save()
 
