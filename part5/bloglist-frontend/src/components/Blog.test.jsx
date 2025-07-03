@@ -47,3 +47,28 @@ test('when the view button is clicked, the url and likes count are also rendered
   const likesText = await screen.findByText(`likes ${blog.likes}`)
   expect(likesText).toBeDefined()
 })
+
+test('when the like button is pressed twice, the likes will increment by 2', async () => {
+  const blog = {
+    title: 'Popular blog 1',
+    author: 'ya boi',
+    url: 'yomama.com',
+    likes: 10
+  }
+
+  const clickLikeHandler = vi.fn()
+  render(<Blog blog={blog} handleLikeClick={clickLikeHandler}/>)
+
+  const viewButton = screen.queryByRole('button', { name: 'view' })
+  expect(viewButton).toBeDefined()
+
+  const user = userEvent.setup()
+  await user.click(viewButton)
+
+  const likesButton = screen.queryByRole('button', { name: 'like' })
+  expect(likesButton).toBeDefined()
+
+  await user.click(likesButton)
+  await user.click(likesButton)
+  expect(clickLikeHandler.mock.calls).toHaveLength(2)
+})
