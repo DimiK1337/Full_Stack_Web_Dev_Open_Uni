@@ -66,9 +66,9 @@ const App = () => {
     setPassword('')
   }
 
-  const addBlogToList = (newBlog) => {
+  const createBlog = async blog => {
+    const newBlog = await blogService.createBlog(blog)
     setBlogs(blogs.concat(newBlog))
-    console.log('new blog', newBlog)
     blogFormRef.current.toggleVisibility()
 
     setErrorMessage({
@@ -101,7 +101,7 @@ const App = () => {
         <p>{user.name} is logged in</p>
         <button onClick={handleLogout}>logout</button>
         <Togglable buttonLabel={'new blog'} ref={blogFormRef}>
-          <BlogForm addBlogToList={addBlogToList} />
+          <BlogForm createBlog={createBlog} />
         </Togglable>
 
         <br />
