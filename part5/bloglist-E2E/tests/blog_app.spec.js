@@ -53,18 +53,25 @@ describe('Blog app', () => {
   })
 
   describe('When logged in', () => {
+    let blog
     beforeEach(async ({ page }) => {
       await loginWith(page, userCredentials.username, userCredentials.password)
+      blog = { title: 'test title', author: 'yomama', url: 'old-chap.bruv.guv.gov.co.uk' }
+      await createBlog(page, blog.title, blog.author, blog.url)
     })
 
     test('a new blog can be created', async ({ page }) => {
-      const blog = { title: 'test title', author: 'yomama', url: 'old-chap.bruv.guv.gov.co.uk' }
-      await createBlog(page, blog.title, blog.author, blog.url)
-
       // expect the title + space + author
       const blogDiv = page.locator('.blog')
       await expect(blogDiv.getByText(blog.title)).toBeVisible()
       await expect(blogDiv.getByText(blog.author)).toBeVisible()
+    })
+
+    test('a blog can be liked', async ({ page }) => {
+      await page.getByRole('button', { name: 'view' }).click()
+      await page.getByText('likes 0')
+      await page.getByRole('button', { name: 'like' }).click()
+      await page.getByText('likes 1')
     })
   })
 })
