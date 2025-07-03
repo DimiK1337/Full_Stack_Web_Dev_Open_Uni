@@ -11,5 +11,10 @@ export default defineConfig({
         changeOrigin: true // Needed for virtual hosted sites
       }
     }
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true, // No need to import 'describe', 'expect', and 'test'
+    setupFiles: './testSetup.js',
   }
 })
