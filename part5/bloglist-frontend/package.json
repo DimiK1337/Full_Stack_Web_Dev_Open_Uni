@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "lint:vite": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint . --fix",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start:test": "NODE_ENV=test node index.js"
   },
   "dependencies": {
     "axios": "^1.4.0",
