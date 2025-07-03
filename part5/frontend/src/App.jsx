@@ -122,7 +122,7 @@ const App = () => {
           </Togglable>
           :
           <div>
-            <p>{user.username} is logged in</p>
+            <p>{user.name} is logged in</p>
             <button onClick={handleLogout}>
               logout
             </button>
