@@ -5,13 +5,16 @@ const loginWith = async (page, username, password)  => {
   await page.getByRole('button', { name: 'login' }).click()
 }
 
-const createBlog = async (page, title, author, url) => {
+const createUser = async (request, userCredentials) => await request.post('/api/users', { data: userCredentials })
+
+const createBlog = async (page, blog ) => {
+  const { title, author, url } = blog
   await page.getByRole('button', { name: 'new blog' }).click()
   await page.locator('#title-input').fill(title)
   await page.locator('#author-input').fill(author)
   await page.locator('#url-input').fill(url)
   await page.getByRole('button', { name: 'create' }).click()
-  await page.locator('.blog').waitFor()
+  await page.getByText(`Added a new blog titled '${title}' by '${author}'`).waitFor()
 }
 
-export { loginWith, createBlog }
+export { loginWith, createUser, createBlog }

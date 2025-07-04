@@ -72,7 +72,7 @@ const App = () => {
     blogFormRef.current.toggleVisibility()
 
     setErrorMessage({
-      message: `Added a new blog titled '${newBlog.title}'`,
+      message: `Added a new blog titled '${newBlog.title}' by '${blog.author}'`,
       type: 'success'
     })
     setTimeout(() => {

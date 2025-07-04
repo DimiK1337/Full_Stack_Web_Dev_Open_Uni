@@ -1,5 +1,5 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
-const { loginWith, createBlog } = require('./helper')
+const { loginWith, createUser, createBlog } = require('./helper')
 
 describe('Blog app', () => {
   let userCredentials
@@ -13,9 +13,7 @@ describe('Blog app', () => {
       username: 'root',
       password: 'sekret'
     }
-    await request.post('/api/users', {
-      data: userCredentials
-    })
+    createUser(request, userCredentials)
 
     // Launch page
     await page.goto('/')
@@ -56,8 +54,9 @@ describe('Blog app', () => {
     let blog
     beforeEach(async ({ page }) => {
       await loginWith(page, userCredentials.username, userCredentials.password)
-      blog = { title: 'test title', author: 'yomama', url: 'old-chap.bruv.guv.gov.co.uk' }
-      await createBlog(page, blog.title, blog.author, blog.url)
+      blog = { title: 'test title 1', author: 'yomama', url: 'old-chap.bruv.guv.gov.co.uk' }
+      //await createBlog(page, blog.title, blog.author, blog.url)
+      await createBlog(page, blog)
     })
 
     test('a new blog can be created', async ({ page }) => {
@@ -91,7 +90,23 @@ describe('Blog app', () => {
       await expect(blogDiv).not.toBeVisible()
     }) 
 
-    
+    test('only the user who added the blog sees the blog\'s delete button', async ({ page, request }) => {
+      // Make another user who posts a blog -> root can't see delete button
+      const logoutButton = await page.getByRole('button', { name: 'logout' })
+      await expect(logoutButton).toBeVisible()
+      await logoutButton.click()
+      const testUserCredentials = { ...userCredentials, username: 'test-user', name: 'CHAD-SAN' }
+      await createUser(request, testUserCredentials)
+      await loginWith(page, testUserCredentials.username, testUserCredentials.password)
+
+      const testUserBlog = { title: 'test title 2', author: 'yomama', url: 'old-chap.bruv.guv.gov.co.uk' }
+      await createBlog(page, testUserBlog)
+      const rootUserBlogDiv = await page.getByText(blog.title)
+      await rootUserBlogDiv.getByRole('button', { name: 'view' }).click()
+      await expect(rootUserBlogDiv.getByRole('button', { name: 'delete' })).not.toBeVisible()
+    })
+
+
   })
 
 })
