@@ -99,14 +99,46 @@ describe('Blog app', () => {
       await createUser(request, testUserCredentials)
       await loginWith(page, testUserCredentials.username, testUserCredentials.password)
 
-      const testUserBlog = { title: 'test title 2', author: 'yomama', url: 'old-chap.bruv.guv.gov.co.uk' }
+      const testUserBlog = { ...blog, title: 'test title 2' }
       await createBlog(page, testUserBlog)
+      await expect(page.locator('.blog').getByText(testUserBlog.title)).toBeVisible()
       const rootUserBlogDiv = await page.getByText(blog.title)
       await rootUserBlogDiv.getByRole('button', { name: 'view' }).click()
       await expect(rootUserBlogDiv.getByRole('button', { name: 'delete' })).not.toBeVisible()
     })
 
+    test('the list of blogs is displayed in descending order sorted by likes', async ({ page }) => {
+      // Order of blogs --> [b1 (2 likes), b2 (1 likes), b0 (0 likes)]
+      const blogs = [
+        blog, { ...blog, title: 'test title 2' }, { ...blog, title: 'test title 3' }
+      ]
+      blogs.slice(1).forEach(async b => await createBlog(page, b))
 
+      // Find the divs of each blogs
+      const blog0Div = page.locator('.blog').filter({ hasText: blogs[0].title }) // Keep at 0 likes
+      const blog1Div = page.locator('.blog').filter({ hasText: blogs[1].title }) // 2 likes
+      const blog2Div = page.locator('.blog').filter({ hasText: blogs[2].title }) // 1 likes
+
+      // Click the view button of each blog and press like n-times
+      await blog0Div.getByRole('button', { name: 'view' }).click()
+      await blog1Div.getByRole('button', { name: 'view' }).click()
+      await blog2Div.getByRole('button', { name: 'view' }).click()
+
+      await blog1Div.getByRole('button', { name: 'like' }).click()
+      await expect(blog1Div.getByText('likes 1')).toBeVisible()
+      await blog1Div.getByRole('button', { name: 'like' }).click()
+      await expect(blog1Div.getByText('likes 2')).toBeVisible()
+      
+      await blog2Div.getByRole('button', { name: 'like' }).click()
+      await expect(blog2Div.getByText('likes 1')).toBeVisible()
+      
+      await expect(blog0Div.getByText('likes 0')).toBeVisible()
+      
+      // Check the order of the blogs
+      const blogDivs = page.locator('.blog')
+      await expect(blogDivs.nth(0)).toContainText(blogs[1].title)
+      await expect(blogDivs.nth(1)).toContainText(blogs[2].title)
+      await expect(blogDivs.nth(2)).toContainText(blogs[0].title)
+    })
   })
-
 })
