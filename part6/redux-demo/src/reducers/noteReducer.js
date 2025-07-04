@@ -32,6 +32,9 @@ const noteReducer = (state = initialState, action) => {
 
 const generateId = () => Number((Math.random() * 1000000).toFixed(0))
 
+/*
+  Action creators
+*/
 export const createNote = (content) => {
   return {
     type: 'NEW_NOTE',
