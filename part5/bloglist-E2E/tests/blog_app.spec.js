@@ -69,9 +69,29 @@ describe('Blog app', () => {
 
     test('a blog can be liked', async ({ page }) => {
       await page.getByRole('button', { name: 'view' }).click()
-      await page.getByText('likes 0')
+      await expect(page.getByText('likes 0')).toBeVisible()
       await page.getByRole('button', { name: 'like' }).click()
-      await page.getByText('likes 1')
+      await expect(page.getByText('likes 1')).toBeVisible()
+
+      // Add this line since the delete button would disappear, fixed by populating the user in the updated blog
+      await expect(page.getByRole('button', { name: 'delete' })).toBeVisible()
+
     })
+
+    test('user who added a blog can delete it', async ({ page }) => {
+      await page.getByRole('button', { name: 'view' }).click()
+      await expect(page.getByRole('button', { name: 'delete' })).toBeVisible()
+      page.on('dialog', async dialog => {
+        console.log(`dialog message: ${dialog.message()}`)
+        await dialog.accept()
+        console.log('dialog accepted')
+      })
+      await page.getByRole('button', { name: 'delete' }).click()
+      const blogDiv = page.locator('.blog').filter({ hasText: `${blog.title} ${blog.author}` })
+      await expect(blogDiv).not.toBeVisible()
+    }) 
+
+    
   })
+
 })
