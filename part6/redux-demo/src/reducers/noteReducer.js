@@ -1,3 +1,4 @@
+import { createSlice } from "@reduxjs/toolkit"
 
 const initialState = [
   {
@@ -12,38 +13,36 @@ const initialState = [
   },
 ]
 
+const generateId = () => Number((Math.random() * 1000000).toFixed(0))
 
-const noteReducer = (state = initialState, action) => {
-  console.log('ACTION (note): ', action)
-  switch (action.type) {
-    case 'NEW_NOTE': return [...state, action.payload]
-    case 'TOGGLE_IMPORTANCE': {
-      const id = action.payload.id
-      const noteToChange = state.find(note => note.id === id)
-      const updatedNote = {
+const noteSlice = createSlice({
+  name: 'notes',
+  initialState,
+  reducers: {
+
+    createNote(state, action) {
+      const content = action.payload
+      const newNote = {
+        content,
+        important: false,
+        id: generateId()
+      }
+      return state.concat(newNote)
+    },
+
+    toggleImportanceOf(state, action) {
+      const id = action.payload
+      const noteToChange = state.find(n => n.id === id)
+      const changedNote = {
         ...noteToChange,
         important: !noteToChange.important
       }
-      return state.map(note => note.id !== id ? note : updatedNote)
+      console.log('state in toggle import', state);
+      
+      return state.map(n => n.id !== id ? n : changedNote)
     }
-    default: return state
   }
-}
+})
 
-const generateId = () => Number((Math.random() * 1000000).toFixed(0))
-
-/*
-  Action creators
-*/
-export const createNote = (content) => {
-  return {
-    type: 'NEW_NOTE',
-    payload: { content, important: false, id: generateId() }
-  }
-}
-
-export const toggleImportanceOf = (id) => {
-  return { type: 'TOGGLE_IMPORTANCE', payload: { id } }
-}
-
-export default noteReducer;
+export const { createNote, toggleImportanceOf } = noteSlice.actions
+export default noteSlice.reducer
