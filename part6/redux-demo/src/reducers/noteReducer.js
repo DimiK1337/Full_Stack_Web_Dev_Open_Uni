@@ -17,17 +17,12 @@ const generateId = () => Number((Math.random() * 1000000).toFixed(0))
 
 const noteSlice = createSlice({
   name: 'notes',
-  initialState,
+  initialState: [],
   reducers: {
 
     createNote(state, action) {
-      const content = action.payload
-      const newNote = {
-        content,
-        important: false,
-        id: generateId()
-      }
-      return state.concat(newNote)
+      const newNoteObject = action.payload
+      return state.concat(newNoteObject)
     },
 
     toggleImportanceOf(state, action) {
@@ -40,9 +35,17 @@ const noteSlice = createSlice({
       console.log('state in toggle import', state);
       
       return state.map(n => n.id !== id ? n : changedNote)
+    },
+
+    appendNote(state, action) {
+      state.push(action.payload)
+    },
+
+    setNotes(state, action) {
+      return action.payload
     }
   }
 })
 
-export const { createNote, toggleImportanceOf } = noteSlice.actions
+export const { createNote, toggleImportanceOf, appendNote, setNotes } = noteSlice.actions
 export default noteSlice.reducer
