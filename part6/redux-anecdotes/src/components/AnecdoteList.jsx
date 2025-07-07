@@ -5,14 +5,13 @@ import { incrementVote } from '../reducers/anecdoteReducer'
 
 const AnecdoteList = () => {
   const dispatch = useDispatch()
-
   const anecdotes = useSelector(
     ({ anecdotes, filter }) => anecdotes.filter(a => a.content.toLowerCase().includes(filter))
   )
 
   const updateAnecdote = (anecdote) => {
     dispatch(incrementVote(anecdote))
-    dispatch(showAndHideNotification(`You vote '${anecdote.content}'`))
+    dispatch(showAndHideNotification(`You voted '${anecdote.content}'`))
   }
 
   return (
