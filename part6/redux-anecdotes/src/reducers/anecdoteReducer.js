@@ -23,25 +23,32 @@ const initialState = anecdotesAtStart.map(asObject)
 
 const anecdoteSlice = createSlice({
   name: 'anecdotes',
-  initialState,
+  initialState: [],
 
   reducers: {
     createAnecdote(state, action) {
-      return [...state, asObject(action.payload)]
+      return [...state, action.payload]
     },
 
     updateVote(state, action) {
       const id = action.payload
       const anecdoteToChange = state.find(a => a.id === id)
-      console.log('anc to Change', anecdoteToChange)
       const updatedAnecdote = {
         ...anecdoteToChange,
         votes: anecdoteToChange.votes + 1
       }
       return state.map(a => a.id !== id ? a : updatedAnecdote)
+    },
+
+    appendAnecdote(state, action) {
+      state.push(action.payload)
+    },
+
+    setAnecdotes(state, action){
+      return action.payload
     }
   }
 })
 
-export const { createAnecdote, updateVote } = anecdoteSlice.actions
+export const { createAnecdote, updateVote, appendAnecdote, setAnecdotes } = anecdoteSlice.actions
 export default anecdoteSlice.reducer
