@@ -1,0 +1,49 @@
+{
+  "notes": [
+    {
+      "content": "the app state is in redux store",
+      "important": true,
+      "id": "1"
+    },
+    {
+      "content": "state changes are made with actions",
+      "important": false,
+      "id": "2"
+    },
+    {
+      "id": "50ec",
+      "content": "saved to backend",
+      "important": false
+    },
+    {
+      "id": "1ee0",
+      "content": "react query",
+      "important": true
+    },
+    {
+      "id": "4b72",
+      "content": "react query but shows after create",
+      "important": true
+    },
+    {
+      "id": "d06c",
+      "content": "liar",
+      "important": true
+    },
+    {
+      "id": "a8a4",
+      "content": "lair2",
+      "important": true
+    },
+    {
+      "id": "4708",
+      "content": "work already",
+      "important": true
+    },
+    {
+      "id": "203c",
+      "content": "work pls",
+      "important": true
+    }
+  ]
+}
