@@ -1,8 +1,6 @@
 import { useDispatch } from 'react-redux'
 import { createNote } from '../reducers/noteReducer'
 
-import noteService from '../services/notes'
-
 const NewNote = () => {
 
   const dispatch = useDispatch()
