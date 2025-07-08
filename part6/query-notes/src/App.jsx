@@ -6,14 +6,23 @@ const App = () => {
   const queryClient = useQueryClient()
   const newNoteMutation = useMutation({
     mutationFn: createNote,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notes'] })
+    onSuccess: (newNote) => {
+
+      // Marks the entries in the cache as "stale" -> Fetches data from server async (makes a GET) -> Updates cache once resp is returned -> Triggers re-render of components
+      //queryClient.invalidateQueries({ queryKey: ['notes'] })
+
+      // Optimizes performance by updating the cache manually -> Rerenders components using `useQuery()`
+      const notes = queryClient.getQueryData(['notes']) || []
+      queryClient.setQueryData(['notes'], notes.concat(newNote))
     }
   })
   const updateNoteMutation = useMutation({
     mutationFn: updateNote,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notes'] })
+    onSuccess: (newNote) => {
+      //queryClient.invalidateQueries({ queryKey: ['notes'] })
+
+      const notes = queryClient.getQueryData(['notes']) || []
+      queryClient.setQueryData(['notes'], notes.map(note => note.id !== newNote.id ? note : newNote))
     }  
   })
   const addNote = async (event) => {
@@ -29,7 +38,8 @@ const App = () => {
 
   const result = useQuery({
     queryKey: ['notes'],
-    queryFn: getNotes
+    queryFn: getNotes,
+    refetchOnWindowFocus: false
   })
   console.log(JSON.parse(JSON.stringify(result)))
 

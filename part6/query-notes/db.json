@@ -33,7 +33,7 @@
     {
       "id": "a8a4",
       "content": "lair2",
-      "important": true
+      "important": false
     },
     {
       "id": "4708",
@@ -43,6 +43,51 @@
     {
       "id": "203c",
       "content": "work pls",
+      "important": true
+    },
+    {
+      "id": "2745",
+      "content": "using invalidateCache",
+      "important": true
+    },
+    {
+      "id": "30b2",
+      "content": "using invalidateCache (restarted everything)",
+      "important": false
+    },
+    {
+      "id": "f431",
+      "content": "using invalidateCache 3",
+      "important": false
+    },
+    {
+      "id": "e78b",
+      "content": "using setData",
+      "important": true
+    },
+    {
+      "id": "e37b",
+      "content": "trigger new notes",
+      "important": false
+    },
+    {
+      "id": "763a",
+      "content": "should appear ",
+      "important": true
+    },
+    {
+      "id": "8660",
+      "content": "ad",
+      "important": false
+    },
+    {
+      "id": "93c4",
+      "content": "",
+      "important": true
+    },
+    {
+      "id": "0771",
+      "content": "s",
       "important": true
     }
   ]
