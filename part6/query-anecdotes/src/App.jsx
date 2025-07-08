@@ -1,4 +1,5 @@
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query'
+import { useSetAndRemoveNotification } from './NotificationContext'
 
 // Server/API
 import { getAnecdotes, updateAnecdote } from './requests'
@@ -8,6 +9,7 @@ import AnecdoteForm from './components/AnecdoteForm'
 import Notification from './components/Notification'
 
 const App = () => {
+  const setNotification = useSetAndRemoveNotification()
   const queryClient = useQueryClient()
 
   const updateAnecdoteMutation = useMutation({
@@ -16,6 +18,7 @@ const App = () => {
       //queryClient.invalidateQueries({ queryKey: ['anecdotes'] })
       const anecdotes = queryClient.getQueryData(['anecdotes'])
       queryClient.setQueryData(['anecdotes'], anecdotes.map(a => a.id !== updatedAnecdote.id ? a : updatedAnecdote))
+      setNotification(`Anecdote ${updatedAnecdote.content} voted`)
     }
   })
 

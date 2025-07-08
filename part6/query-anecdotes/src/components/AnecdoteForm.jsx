@@ -1,8 +1,14 @@
+import { useContext } from 'react'
+import NotificationContext from '../NotificationContext'
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query'
+import { useSetAndRemoveNotification } from '../NotificationContext'
 
+// Server/API
 import { createAnecdote } from '../requests'
 
 const AnecdoteForm = () => {
+  const setNotification = useSetAndRemoveNotification()
+
   const queryClient = useQueryClient()
 
   const newAnecdoteMutation = useMutation({
@@ -13,6 +19,7 @@ const AnecdoteForm = () => {
       // Performance optimized -> One less GET 
       const anecdotes = queryClient.getQueryData(['anecdotes'])
       queryClient.setQueryData(['anecdotes'], anecdotes.concat(newAnecdote))
+      setNotification(`Added anecdote ${newAnecdote.content}`)
     }
   })
 
