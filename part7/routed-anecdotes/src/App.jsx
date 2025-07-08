@@ -70,16 +70,16 @@ const CreateNew = (props) => {
   const navigate = useNavigate()
 
   // States
-  const content = useField('text')
-  const author = useField('text')
-  const info = useField('text')
+  const { reset: resetContent, ...contentInputProps } = useField('text')
+  const { reset: resetAuthor, ...authorInputProps } = useField('text')
+  const { reset: resetInfo, ...infoInputProps } = useField('text')
 
   const handleSubmit = (e) => {
     e.preventDefault()
     const newNote = {
-      content: content.value,
-      author: author.value,
-      info: info.value,
+      content: contentInputProps.value,
+      author: authorInputProps.value,
+      info: infoInputProps.value,
       votes: 0
     }
     console.log('new note in handle submit', newNote);
@@ -87,8 +87,15 @@ const CreateNew = (props) => {
     props.addNew(newNote)
 
     // Set the notification -> clear form fields -> redirect
-    props.setNotification(`A new anecdote '${content.value}' has been created!`)
+    props.setNotification(`A new anecdote '${contentInputProps.value}' has been created!`)
     navigate('/')
+  }
+
+  const handleReset = (e) => {
+    e.preventDefault()
+    resetContent()
+    resetAuthor()
+    resetInfo()
   }
 
   return (
@@ -97,17 +104,18 @@ const CreateNew = (props) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input name='content' {...content}/>
+          <input name='content' {...contentInputProps}/>
         </div>
         <div>
           author
-          <input name='author' {...author}/>
+          <input name='author' {...authorInputProps}/>
         </div>
         <div>
           url for more info
-          <input name='info' {...info}/>
+          <input name='info' {...infoInputProps}/>
         </div>
         <button>create</button>
+        <button onClick={handleReset}>reset</button>
       </form>
     </div>
   )
