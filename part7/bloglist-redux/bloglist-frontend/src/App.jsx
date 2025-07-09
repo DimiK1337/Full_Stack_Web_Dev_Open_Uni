@@ -1,18 +1,25 @@
 import { useState, useEffect, useRef } from 'react'
+import { useDispatch } from 'react-redux'
 
+// Components
 import Togglable from './components/Togglable'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 
+// Services
 import blogService from './services/blogs'
 import loginService from './services/login'
 
+// Reducers
+import { showAndHideNotification } from './reducers/notificationReducer'
+
 const App = () => {
+  const dispatch = useDispatch()
+
   // State
   const [blogs, setBlogs] = useState([])
-  const [errorMessage, setErrorMessage] = useState(null)
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -32,6 +39,12 @@ const App = () => {
     blogService.setToken(user.token)
   }, [])
 
+  const setUserLoginForm = (user, username, password) => {
+    setUser(user)
+    setUsername(username)
+    setPassword(password)
+  }
+
   const handleLogin = async (event) => {
     event.preventDefault()
 
@@ -39,39 +52,24 @@ const App = () => {
       const user = await loginService.login({ username, password })
       window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
       blogService.setToken(user.token)
+      setUserLoginForm(user, username, password)
 
-      setUser(user)
-      setUsername(username)
-      setPassword(password)
     } catch (exception) {
-      setErrorMessage({ message: 'Wrong credentials', type: 'error' })
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
+      dispatch(showAndHideNotification('Wrong credentials', 'error'))
     }
   }
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     blogService.setToken('')
-
-    setUser(null)
-    setUsername('')
-    setPassword('')
+    setUserLoginForm(null, '', '')
   }
 
   const createBlog = async (blog) => {
     const newBlog = await blogService.createBlog(blog)
     setBlogs(blogs.concat(newBlog))
     blogFormRef.current.toggleVisibility()
-
-    setErrorMessage({
-      message: `Added a new blog titled '${newBlog.title}' by '${blog.author}'`,
-      type: 'success',
-    })
-    setTimeout(() => {
-      setErrorMessage(null)
-    }, 5000)
+    dispatch(showAndHideNotification(`Added a new blog titled '${newBlog.title}' by '${blog.author}'`))
   }
 
   const handleLikeClick = async (blogToUpdate) => {
@@ -122,7 +120,7 @@ const App = () => {
 
   return (
     <div>
-      <Notification messageObj={errorMessage} />
+      <Notification />
       {user === null ? (
         <Togglable buttonLabel={'login'}>
           <LoginForm
