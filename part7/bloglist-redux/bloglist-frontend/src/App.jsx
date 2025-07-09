@@ -14,13 +14,12 @@ import loginService from './services/login'
 
 // Reducers
 import { showAndHideNotification } from './reducers/notificationReducer'
-import { initializeBlogs, createBlog } from './reducers/blogReducer'
+import { initializeBlogs, createBlog, incrementLike, deleteBlog } from './reducers/blogReducer'
 
 const App = () => {
   const dispatch = useDispatch()
 
   // State
-  //const [blogs, setBlogs] = useState([])
   const blogs = useSelector(state => state.blogs)
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
@@ -30,8 +29,6 @@ const App = () => {
   const blogFormRef = useRef()
 
   useEffect(() => {
-    // TODO: This will be done in the reducer
-    //blogService.getAll().then((blogs) => setBlogs(blogs))
     dispatch(initializeBlogs())
   }, [dispatch])
 
@@ -70,38 +67,23 @@ const App = () => {
   }
 
   const handleCreateBlog = async (blog) => {
-    // TODO: Put the blog service in the reducer
-    /* const newBlog = await blogService.createBlog(blog)
-    setBlogs(blogs.concat(newBlog)) */
     dispatch(createBlog(blog))
     blogFormRef.current.toggleVisibility()
     dispatch(showAndHideNotification(`Added a new blog titled '${blog.title}' by '${blog.author}'`))
   }
 
   const handleLikeClick = async (blogToUpdate) => {
-    const newBlog = {
-      ...blogToUpdate,
-      likes: blogToUpdate.likes + 1,
-      user: blogToUpdate.user.id,
-    }
-    const updatedBlog = await blogService.updateBlog(blogToUpdate.id, newBlog)
-
-    // TODO: Send dispatch for updating likes
-    /* setBlogs(
-      blogs.map((blog) => (blog.id !== updatedBlog.id ? blog : updatedBlog))
-    ) */
+    dispatch(incrementLike(blogToUpdate))
   }
 
   // Handle delete
   const handleDelete = async (blogToDelete) => {
     const deleteOk = window.confirm(`delete blog ${blogToDelete.title}`)
     if (!deleteOk) return
-    await blogService.deleteBlog(blogToDelete.id)
-    //setBlogs(blogs.filter((blog) => blogToDelete.id !== blog.id))
+    dispatch(deleteBlog(blogToDelete.id))
   }
 
   const blogDisplay = () => {
-    console.log('in blog display func, blogs=', blogs)
     return (
       <>
         <h2>blogs</h2>
