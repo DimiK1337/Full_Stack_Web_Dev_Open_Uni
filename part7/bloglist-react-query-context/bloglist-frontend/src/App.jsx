@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useContext } from 'react'
 
 import Togglable from './components/Togglable'
 import Blog from './components/Blog'
@@ -6,14 +6,20 @@ import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 
+// Services
 import blogService from './services/blogs'
 import loginService from './services/login'
+
+// Contexts
+import NotificationContext from './NotificationContext'
 
 const App = () => {
   // State
   const [blogs, setBlogs] = useState([])
-  const [errorMessage, setErrorMessage] = useState(null)
+  //const [errorMessage, setErrorMessage] = useState(null)
+  const [notification, notificationDispatch] = useContext(NotificationContext)
   const [user, setUser] = useState(null)
+
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
@@ -32,10 +38,20 @@ const App = () => {
     blogService.setToken(user.token)
   }, [])
 
+
+  const setNotification = (message, type = 'success', time = 5) => {
+    notificationDispatch({
+      type: 'SET_NOTIFICATION',
+      payload: { message, type }
+    })
+    setTimeout(() => { notificationDispatch({ type: 'REMOVE_NOTIFICATION' }) }, time*1000)
+  }
+
   const handleLogin = async (event) => {
     event.preventDefault()
 
     try {
+      // TODO: useContext
       const user = await loginService.login({ username, password })
       window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
       blogService.setToken(user.token)
@@ -44,10 +60,7 @@ const App = () => {
       setUsername(username)
       setPassword(password)
     } catch (exception) {
-      setErrorMessage({ message: 'Wrong credentials', type: 'error' })
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
+      setNotification('Wrong credentials', 'error')
     }
   }
 
@@ -64,14 +77,7 @@ const App = () => {
     const newBlog = await blogService.createBlog(blog)
     setBlogs(blogs.concat(newBlog))
     blogFormRef.current.toggleVisibility()
-
-    setErrorMessage({
-      message: `Added a new blog titled '${newBlog.title}' by '${blog.author}'`,
-      type: 'success',
-    })
-    setTimeout(() => {
-      setErrorMessage(null)
-    }, 5000)
+    setNotification(`Added a new blog titled '${newBlog.title}' by '${blog.author}'`)
   }
 
   const handleLikeClick = async (blogToUpdate) => {
@@ -122,7 +128,7 @@ const App = () => {
 
   return (
     <div>
-      <Notification messageObj={errorMessage} />
+      <Notification />
       {user === null ? (
         <Togglable buttonLabel={'login'}>
           <LoginForm
