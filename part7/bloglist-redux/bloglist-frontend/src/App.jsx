@@ -15,13 +15,14 @@ import loginService from './services/login'
 // Reducers
 import { showAndHideNotification } from './reducers/notificationReducer'
 import { initializeBlogs, createBlog, incrementLike, deleteBlog } from './reducers/blogReducer'
+import { setUser, removeUser } from './reducers/userReducer'
 
 const App = () => {
   const dispatch = useDispatch()
 
   // State
   const blogs = useSelector(state => state.blogs)
-  const [user, setUser] = useState(null)
+  const user = useSelector(state => state.user)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
@@ -35,25 +36,21 @@ const App = () => {
   useEffect(() => {
     const loggedInJSON = window.localStorage.getItem('loggedBlogappUser')
     if (!loggedInJSON) return
-    const user = JSON.parse(loggedInJSON)
-    setUser(user)
-    blogService.setToken(user.token)
+    const loggedInUser = JSON.parse(loggedInJSON)
+    setUser(loggedInUser)
+    blogService.setToken(loggedInUser.token)
   }, [])
-
-  const setUserLoginForm = (user, username, password) => {
-    setUser(user)
-    setUsername(username)
-    setPassword(password)
-  }
 
   const handleLogin = async (event) => {
     event.preventDefault()
 
     try {
-      const user = await loginService.login({ username, password })
-      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
-      blogService.setToken(user.token)
-      setUserLoginForm(user, username, password)
+      const loggedInUser = await loginService.login({ username, password })
+      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(loggedInUser))
+      blogService.setToken(loggedInUser.token)
+      dispatch(setUser(loggedInUser))
+      setUsername(username)
+      setPassword(password)
 
     } catch (exception) {
       dispatch(showAndHideNotification('Wrong credentials', 'error'))
@@ -63,7 +60,9 @@ const App = () => {
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     blogService.setToken('')
-    setUserLoginForm(null, '', '')
+    dispatch(removeUser())
+    setUsername('')
+    setPassword('')
   }
 
   const handleCreateBlog = async (blog) => {
