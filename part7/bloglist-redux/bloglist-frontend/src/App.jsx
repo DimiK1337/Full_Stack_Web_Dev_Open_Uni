@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 // Components
 import Togglable from './components/Togglable'
@@ -14,12 +14,14 @@ import loginService from './services/login'
 
 // Reducers
 import { showAndHideNotification } from './reducers/notificationReducer'
+import { initializeBlogs, createBlog } from './reducers/blogReducer'
 
 const App = () => {
   const dispatch = useDispatch()
 
   // State
-  const [blogs, setBlogs] = useState([])
+  //const [blogs, setBlogs] = useState([])
+  const blogs = useSelector(state => state.blogs)
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -28,8 +30,10 @@ const App = () => {
   const blogFormRef = useRef()
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
-  }, [])
+    // TODO: This will be done in the reducer
+    //blogService.getAll().then((blogs) => setBlogs(blogs))
+    dispatch(initializeBlogs())
+  }, [dispatch])
 
   useEffect(() => {
     const loggedInJSON = window.localStorage.getItem('loggedBlogappUser')
@@ -65,11 +69,13 @@ const App = () => {
     setUserLoginForm(null, '', '')
   }
 
-  const createBlog = async (blog) => {
-    const newBlog = await blogService.createBlog(blog)
-    setBlogs(blogs.concat(newBlog))
+  const handleCreateBlog = async (blog) => {
+    // TODO: Put the blog service in the reducer
+    /* const newBlog = await blogService.createBlog(blog)
+    setBlogs(blogs.concat(newBlog)) */
+    dispatch(createBlog(blog))
     blogFormRef.current.toggleVisibility()
-    dispatch(showAndHideNotification(`Added a new blog titled '${newBlog.title}' by '${blog.author}'`))
+    dispatch(showAndHideNotification(`Added a new blog titled '${blog.title}' by '${blog.author}'`))
   }
 
   const handleLikeClick = async (blogToUpdate) => {
@@ -79,9 +85,11 @@ const App = () => {
       user: blogToUpdate.user.id,
     }
     const updatedBlog = await blogService.updateBlog(blogToUpdate.id, newBlog)
-    setBlogs(
+
+    // TODO: Send dispatch for updating likes
+    /* setBlogs(
       blogs.map((blog) => (blog.id !== updatedBlog.id ? blog : updatedBlog))
-    )
+    ) */
   }
 
   // Handle delete
@@ -89,21 +97,22 @@ const App = () => {
     const deleteOk = window.confirm(`delete blog ${blogToDelete.title}`)
     if (!deleteOk) return
     await blogService.deleteBlog(blogToDelete.id)
-    setBlogs(blogs.filter((blog) => blogToDelete.id !== blog.id))
+    //setBlogs(blogs.filter((blog) => blogToDelete.id !== blog.id))
   }
 
   const blogDisplay = () => {
+    console.log('in blog display func, blogs=', blogs)
     return (
       <>
         <h2>blogs</h2>
         <p>{user.name} is logged in</p>
         <button onClick={handleLogout}>logout</button>
         <Togglable buttonLabel={'new blog'} ref={blogFormRef}>
-          <BlogForm createBlog={createBlog} />
+          <BlogForm createBlog={handleCreateBlog} />
         </Togglable>
 
         <br />
-        {blogs
+        {[...blogs]
           .sort((a, b) => b.likes - a.likes)
           .map((blog) => (
             <Blog
