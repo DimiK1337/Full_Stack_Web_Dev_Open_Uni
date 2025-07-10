@@ -10,7 +10,7 @@ const Blog = ({ blog, user, handleLikeClick, handleDelete }) => {
   }
 
   const [visible, setVisible] = useState(false)
-  const belongsToUser = blog.user && blog.user.username === user.username
+  const belongsToUser = user && blog.user && blog.user.username === user.username
 
   return (
     <div style={blogStyle} className="blog">

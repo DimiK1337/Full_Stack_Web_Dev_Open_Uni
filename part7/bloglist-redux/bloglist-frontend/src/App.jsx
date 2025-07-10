@@ -1,12 +1,18 @@
 import { useState, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import {
+  Routes, Route, Link
+} from 'react-router-dom'
+
 // Components
 import Togglable from './components/Togglable'
 import Blog from './components/Blog'
+import BlogList from './components/BlogList'
 import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
+import Users from './components/Users'
 
 // Services
 import blogService from './services/blogs'
@@ -37,9 +43,9 @@ const App = () => {
     const loggedInJSON = window.localStorage.getItem('loggedBlogappUser')
     if (!loggedInJSON) return
     const loggedInUser = JSON.parse(loggedInJSON)
-    setUser(loggedInUser)
+    dispatch(setUser(loggedInUser))
     blogService.setToken(loggedInUser.token)
-  }, [])
+  }, [dispatch])
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -82,48 +88,45 @@ const App = () => {
     dispatch(deleteBlog(blogToDelete.id))
   }
 
-  const blogDisplay = () => {
-    return (
-      <>
-        <h2>blogs</h2>
-        <p>{user.name} is logged in</p>
-        <button onClick={handleLogout}>logout</button>
-        <Togglable buttonLabel={'new blog'} ref={blogFormRef}>
-          <BlogForm createBlog={handleCreateBlog} />
-        </Togglable>
-
-        <br />
-        {[...blogs]
-          .sort((a, b) => b.likes - a.likes)
-          .map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              user={user}
-              handleLikeClick={() => handleLikeClick(blog)}
-              handleDelete={() => handleDelete(blog)}
-            />
-          ))}
-      </>
-    )
+  // Custom Routes
+  const blogListProps = {
+    blogs,
+    blogFormRef,
+    createBlog,
+    handleLikeClick,
+    handleDelete
   }
+
+  console.log('user.name ?????', user)
 
   return (
     <div>
       <Notification />
-      {user === null ? (
-        <Togglable buttonLabel={'login'}>
-          <LoginForm
-            username={username}
-            password={password}
-            handleUsernameChange={({ target }) => setUsername(target.value)}
-            handlePasswordChange={({ target }) => setPassword(target.value)}
-            handleSubmit={handleLogin}
-          />
-        </Togglable>
-      ) : (
-        blogDisplay()
-      )}
+      <h2>blogs</h2>
+
+      {user === null
+        ? (
+          <Togglable buttonLabel={'login'}>
+            <LoginForm
+              username={username}
+              password={password}
+              handleUsernameChange={({ target }) => setUsername(target.value)}
+              handlePasswordChange={({ target }) => setPassword(target.value)}
+              handleSubmit={handleLogin}
+            />
+          </Togglable>
+        )
+        : (
+          <>
+            <p>{user.name} is logged in</p>
+            <button onClick={handleLogout}>logout</button>
+          </>
+        )
+      }
+      <Routes>
+        <Route path='/' element={<BlogList {...blogListProps} />} />
+        <Route path='/users' element={<Users blogs={blogs} />} />
+      </Routes>
     </div>
   )
 }

@@ -1,12 +1,19 @@
-import { useState, useEffect, useRef, useContext } from 'react'
+import { useState, useEffect, useRef, useContext, useMemo } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
+import {
+  Routes, Route, Link
+} from 'react-router-dom'
 
 // Components
 import Togglable from './components/Togglable'
+import BlogList from './components/BlogList'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
+
+import Users from './components/Users'
 
 // Services
 import blogService from './services/blogs'
@@ -15,6 +22,7 @@ import loginService from './services/login'
 // Contexts
 import { useNotificationDispatch } from './NotificationContext'
 import UserContext from './UserContext'
+
 
 const App = () => {
   // Query Client
@@ -78,6 +86,7 @@ const App = () => {
 
   const blogs = blogQueryResult.data
 
+
   // Event handlers
   const setNotification = (message, type = 'success', time = 5) => {
     notificationDispatch({
@@ -124,39 +133,10 @@ const App = () => {
     user: blogToUpdate.user.id
   })
 
-  // Handle delete
   const handleDelete = async (blogToDelete) => {
     const deleteOk = window.confirm(`delete blog ${blogToDelete.title}`)
     if (!deleteOk) return
     deleteBlogMutation.mutate(blogToDelete.id)
-  }
-
-  const blogDisplay = () => {
-    if (!blogs) {
-      console.error('blogs array causes an error in blogDisplay(), blogs=', blogs)
-    }
-    return (
-      <>
-        <h2>blogs</h2>
-        <p>{user.name} is logged in</p>
-        <button onClick={handleLogout}>logout</button>
-        <Togglable buttonLabel={'new blog'} ref={blogFormRef}>
-          <BlogForm createBlog={createBlog} />
-        </Togglable>
-
-        <br />
-        {[...blogs]
-          .sort((a, b) => b.likes - a.likes)
-          .map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              handleLikeClick={() => handleLikeClick(blog)}
-              handleDelete={() => handleDelete(blog)}
-            />
-          ))}
-      </>
-    )
   }
 
   // Shows 'loading' or 'error' for blogs
@@ -169,22 +149,43 @@ const App = () => {
     return <div>Server error occurred while loading blogs</div>
   }
 
+  // Custom Routes
+  const blogListProps = {
+    blogs,
+    blogFormRef,
+    createBlog,
+    handleLikeClick,
+    handleDelete
+  }
+
   return (
     <div>
       <Notification />
-      {user === null ? (
-        <Togglable buttonLabel={'login'}>
-          <LoginForm
-            username={username}
-            password={password}
-            handleUsernameChange={({ target }) => setUsername(target.value)}
-            handlePasswordChange={({ target }) => setPassword(target.value)}
-            handleSubmit={handleLogin}
-          />
-        </Togglable>
-      ) : (
-        blogDisplay()
-      )}
+      <h2>blogs</h2>
+
+      {user === null
+        ? (
+          <Togglable buttonLabel={'login'}>
+            <LoginForm
+              username={username}
+              password={password}
+              handleUsernameChange={({ target }) => setUsername(target.value)}
+              handlePasswordChange={({ target }) => setPassword(target.value)}
+              handleSubmit={handleLogin}
+            />
+          </Togglable>
+        )
+        : (
+          <>
+            <p>{user.name} is logged in</p>
+            <button onClick={handleLogout}>logout</button>
+          </>
+        )
+      }
+      <Routes>
+        <Route path='/' element={<BlogList {...blogListProps} />} />
+        <Route path='/users' element={<Users blogs={blogs} />} />
+      </Routes>
     </div>
   )
 }
