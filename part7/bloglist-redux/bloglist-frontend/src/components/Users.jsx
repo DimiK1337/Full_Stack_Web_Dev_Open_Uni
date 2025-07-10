@@ -1,15 +1,11 @@
-import { useMemo } from 'react'
-
 import { Link } from 'react-router-dom'
-import useUserMap from '../hooks/useUserMap'
+import { Table } from 'react-bootstrap'
 
 const Users = ({ users }) => {
-  // Disable the new blog button while in the Users view
-
   return (
     <div>
-      <h2>Users</h2>
-      <table>
+      <h3>Users</h3>
+      <Table striped>
         <tbody>
           <tr>
             <th></th>
@@ -28,10 +24,9 @@ const Users = ({ users }) => {
             </tr>
           )}
         </tbody>
-      </table>
+      </Table>
     </div>
   )
-
 }
 
 export default Users

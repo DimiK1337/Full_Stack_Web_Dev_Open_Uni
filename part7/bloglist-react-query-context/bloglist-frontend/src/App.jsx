@@ -167,7 +167,7 @@ const App = () => {
 
   // Custom Routes
   return (
-    <div>
+    <div className='container'>
       <Notification />
       <NavigationBar/>
       <h2>blogs</h2>
@@ -189,7 +189,7 @@ const App = () => {
           blogFormRef={blogFormRef}
           handleCreateBlog={handleCreateBlog} />}
         />
-        <Route path='/users' element={<Users blogs={blogs} />} />
+        <Route path='/users' element={<Users users={users} />} />
         <Route path='/users/:id' element={<User user={foundUser} />} />
         <Route path='/blogs/:id' element={<Blog
           user={user}

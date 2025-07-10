@@ -96,7 +96,7 @@ const App = () => {
   }
 
   return (
-    <div>
+    <div className='container'>
       <Notification />
       <NavigationBar/>
       <h2>blogs</h2>

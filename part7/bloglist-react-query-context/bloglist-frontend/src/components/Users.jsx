@@ -1,15 +1,11 @@
-import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
+import { Table } from 'react-bootstrap'
 
-import useUserMap from '../hooks/useUserMap'
-
-const Users = ({ blogs }) => {
-
-  const users = useUserMap(blogs)
+const Users = ({ users }) => {
   return (
     <div>
-      <h2>Users</h2>
-      <table>
+      <h3>Users</h3>
+      <Table striped>
         <tbody>
           <tr>
             <th></th>
@@ -28,10 +24,9 @@ const Users = ({ blogs }) => {
             </tr>
           )}
         </tbody>
-      </table>
+      </Table>
     </div>
   )
-
 }
 
 export default Users

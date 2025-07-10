@@ -12,3 +12,15 @@ Nothing to report
 
 **Live Demo:**  
 [https://phonebook-backend-vmop.onrender.com/](https://phonebook-backend-vmop.onrender.com/)
+
+## Part 4:
+Nothing to report
+
+## Part 5:
+Nothing to report
+
+## Part 6:
+Nothing to report
+
+## Part 7:
+Nothing to report
