@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useContext } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import Togglable from './components/Togglable'
 import Blog from './components/Blog'
@@ -11,40 +12,59 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 
 // Contexts
-import NotificationContext from './NotificationContext'
+import { useNotificationDispatch } from './NotificationContext'
 
 const App = () => {
-  // State
-  const [blogs, setBlogs] = useState([])
-  //const [errorMessage, setErrorMessage] = useState(null)
-  const [notification, notificationDispatch] = useContext(NotificationContext)
-  const [user, setUser] = useState(null)
 
+  // Query Client
+  const queryClient = useQueryClient()
+
+  // State
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+
+
+  const notificationDispatch = useNotificationDispatch()
+  const [user, setUser] = useState(null)
 
   // Refs
   const blogFormRef = useRef()
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
-  }, [])
-
-  useEffect(() => {
     const loggedInJSON = window.localStorage.getItem('loggedBlogappUser')
     if (!loggedInJSON) return
     const user = JSON.parse(loggedInJSON)
-    setUser(user)
     blogService.setToken(user.token)
+
+    // TODO: Use Context for logged in user
+    setUser(user)
   }, [])
 
+  // Blog Query & Mutation
+  const blogQueryResult = useQuery({
+    queryKey: ['blogs'],
+    queryFn: async () => await blogService.getAll(),
+    onError: (error) => console.error('Error fetching blogs:', error)
+  })
 
+  const addBlogMutation = useMutation({
+    mutationFn: async (blog) => await blogService.createBlog(blog),
+    onSuccess: (newBlog) => {
+      //queryClient.invalidateQueries({ queryKey: ['blogs'] })
+      const blogs = queryClient.getQueryData(['blogs'])
+      queryClient.setQueryData(['blogs'], blogs.concat(newBlog))
+    }
+  })
+
+  const blogs = blogQueryResult.data
+
+  // Event handlers
   const setNotification = (message, type = 'success', time = 5) => {
     notificationDispatch({
       type: 'SET_NOTIFICATION',
       payload: { message, type }
     })
-    setTimeout(() => { notificationDispatch({ type: 'REMOVE_NOTIFICATION' }) }, time*1000)
+    setTimeout(() => { notificationDispatch({ type: 'REMOVE_NOTIFICATION' }) }, time * 1000)
   }
 
   const handleLogin = async (event) => {
@@ -55,10 +75,12 @@ const App = () => {
       const user = await loginService.login({ username, password })
       window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
       blogService.setToken(user.token)
-
-      setUser(user)
       setUsername(username)
       setPassword(password)
+
+      // TODO: Use Context for logged in user
+      setUser(user)
+
     } catch (exception) {
       setNotification('Wrong credentials', 'error')
     }
@@ -67,17 +89,17 @@ const App = () => {
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     blogService.setToken('')
-
-    setUser(null)
     setUsername('')
     setPassword('')
+
+    // TODO: Use Context for logged in user
+    setUser(null)
   }
 
   const createBlog = async (blog) => {
-    const newBlog = await blogService.createBlog(blog)
-    setBlogs(blogs.concat(newBlog))
     blogFormRef.current.toggleVisibility()
-    setNotification(`Added a new blog titled '${newBlog.title}' by '${blog.author}'`)
+    setNotification(`Added a new blog titled '${blog.title}' by '${blog.author}'`)
+    addBlogMutation.mutate({ ...blog, likes: 0 })
   }
 
   const handleLikeClick = async (blogToUpdate) => {
@@ -86,21 +108,28 @@ const App = () => {
       likes: blogToUpdate.likes + 1,
       user: blogToUpdate.user.id,
     }
+
+    // TODO: Use React Query
     const updatedBlog = await blogService.updateBlog(blogToUpdate.id, newBlog)
-    setBlogs(
+    /* setBlogs(
       blogs.map((blog) => (blog.id !== updatedBlog.id ? blog : updatedBlog))
-    )
+    ) */
   }
 
   // Handle delete
   const handleDelete = async (blogToDelete) => {
     const deleteOk = window.confirm(`delete blog ${blogToDelete.title}`)
     if (!deleteOk) return
+
+    // TODO: Use React Query
     await blogService.deleteBlog(blogToDelete.id)
-    setBlogs(blogs.filter((blog) => blogToDelete.id !== blog.id))
+    //setBlogs(blogs.filter((blog) => blogToDelete.id !== blog.id))
   }
 
   const blogDisplay = () => {
+    if (!blogs) {
+      console.error('blogs array causes an error in blogDisplay(), blogs=', blogs)
+    }
     return (
       <>
         <h2>blogs</h2>
@@ -111,7 +140,7 @@ const App = () => {
         </Togglable>
 
         <br />
-        {blogs
+        {[...blogs]
           .sort((a, b) => b.likes - a.likes)
           .map((blog) => (
             <Blog
@@ -124,6 +153,16 @@ const App = () => {
           ))}
       </>
     )
+  }
+
+  // Shows 'loading' or 'error' for blogs
+  if (blogQueryResult.isLoading) {
+    return <div>Blogs are loading...</div>
+  }
+
+  if (blogQueryResult.isError) {
+    console.error(blogQueryResult.error)
+    return <div>Server error occurred while loading blogs</div>
   }
 
   return (
