@@ -6,6 +6,7 @@ import {
 } from 'react-router-dom'
 
 // Components
+import NavigationBar from './components/NavigationBar'
 import Togglable from './components/Togglable'
 import Blog from './components/Blog'
 import BlogList from './components/BlogList'
@@ -76,13 +77,6 @@ const App = () => {
     }
   }
 
-  const handleLogout = () => {
-    window.localStorage.removeItem('loggedBlogappUser')
-    blogService.setToken('')
-    dispatch(removeUser())
-    setUsername('')
-    setPassword('')
-  }
 
   const handleCreateBlog = async (blog) => {
     dispatch(createBlog(blog))
@@ -104,27 +98,21 @@ const App = () => {
   return (
     <div>
       <Notification />
+      <NavigationBar/>
       <h2>blogs</h2>
 
-      {user === null
-        ? (
-          <Togglable buttonLabel={'login'}>
-            <LoginForm
-              username={username}
-              password={password}
-              handleUsernameChange={({ target }) => setUsername(target.value)}
-              handlePasswordChange={({ target }) => setPassword(target.value)}
-              handleSubmit={handleLogin}
-            />
-          </Togglable>
-        )
-        : (
-          <>
-            <p>{user.name} is logged in</p>
-            <button onClick={handleLogout}>logout</button>
-          </>
-        )
-      }
+      {user === null && (
+        <Togglable buttonLabel={'login'}>
+          <LoginForm
+            username={username}
+            password={password}
+            handleUsernameChange={({ target }) => setUsername(target.value)}
+            handlePasswordChange={({ target }) => setPassword(target.value)}
+            handleSubmit={handleLogin}
+          />
+        </Togglable>
+      )}
+
       <Routes>
         <Route path='/' element={<BlogList
           blogs={blogs}

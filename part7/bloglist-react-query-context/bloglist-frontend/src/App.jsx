@@ -25,7 +25,7 @@ import loginService from './services/login'
 import { useNotificationDispatch } from './NotificationContext'
 import UserContext from './UserContext'
 import useUserMap from './hooks/useUserMap'
-
+import NavigationBar from './components/NavigationBar'
 
 
 const App = () => {
@@ -166,35 +166,22 @@ const App = () => {
   }
 
   // Custom Routes
-  const blogListProps = {
-    blogs,
-    blogFormRef,
-    handleCreateBlog
-  }
-
   return (
     <div>
       <Notification />
+      <NavigationBar/>
       <h2>blogs</h2>
 
-      {user === null
-        ? (
-          <Togglable buttonLabel={'login'}>
-            <LoginForm
-              username={username}
-              password={password}
-              handleUsernameChange={({ target }) => setUsername(target.value)}
-              handlePasswordChange={({ target }) => setPassword(target.value)}
-              handleSubmit={handleLogin}
-            />
-          </Togglable>
-        )
-        : (
-          <>
-            <p>{user.name} is logged in</p>
-            <button onClick={handleLogout}>logout</button>
-          </>
-        )
+      {user === null &&
+        <Togglable buttonLabel={'login'}>
+          <LoginForm
+            username={username}
+            password={password}
+            handleUsernameChange={({ target }) => setUsername(target.value)}
+            handlePasswordChange={({ target }) => setPassword(target.value)}
+            handleSubmit={handleLogin}
+          />
+        </Togglable>
       }
       <Routes>
         <Route path='/' element={<BlogList
@@ -211,7 +198,7 @@ const App = () => {
           handleLikeClick={() => handleLikeClick(foundBlog)} />}
         />
       </Routes>
-    </div>
+    </div >
   )
 }
 
