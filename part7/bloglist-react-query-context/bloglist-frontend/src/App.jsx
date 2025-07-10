@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useContext } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
+// Components
 import Togglable from './components/Togglable'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
@@ -13,19 +14,19 @@ import loginService from './services/login'
 
 // Contexts
 import { useNotificationDispatch } from './NotificationContext'
+import UserContext from './UserContext'
 
 const App = () => {
-
   // Query Client
   const queryClient = useQueryClient()
 
-  // State
+  // React internal State
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-
+  // Context state
   const notificationDispatch = useNotificationDispatch()
-  const [user, setUser] = useState(null)
+  const [user, userDispatch] = useContext(UserContext)
 
   // Refs
   const blogFormRef = useRef()
@@ -33,12 +34,10 @@ const App = () => {
   useEffect(() => {
     const loggedInJSON = window.localStorage.getItem('loggedBlogappUser')
     if (!loggedInJSON) return
-    const user = JSON.parse(loggedInJSON)
-    blogService.setToken(user.token)
-
-    // TODO: Use Context for logged in user
-    setUser(user)
-  }, [])
+    const loggedInUser = JSON.parse(loggedInJSON)
+    blogService.setToken(loggedInUser.token)
+    userDispatch({ type: 'SET_USER', payload: loggedInUser })
+  }, [userDispatch])
 
   // Blog Query & Mutation
   const blogQueryResult = useQuery({
@@ -93,14 +92,12 @@ const App = () => {
 
     try {
       // TODO: useContext
-      const user = await loginService.login({ username, password })
-      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
-      blogService.setToken(user.token)
+      const loggedInUser = await loginService.login({ username, password })
+      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(loggedInUser))
+      blogService.setToken(loggedInUser.token)
       setUsername(username)
       setPassword(password)
-
-      // TODO: Use Context for logged in user
-      setUser(user)
+      userDispatch({ type: 'SET_USER', payload: loggedInUser })
 
     } catch (exception) {
       setNotification('Wrong credentials', 'error')
@@ -112,9 +109,7 @@ const App = () => {
     blogService.setToken('')
     setUsername('')
     setPassword('')
-
-    // TODO: Use Context for logged in user
-    setUser(null)
+    userDispatch({ type: 'REMOVE_USER' })
   }
 
   const createBlog = async (blog) => {
@@ -156,7 +151,6 @@ const App = () => {
             <Blog
               key={blog.id}
               blog={blog}
-              user={user}
               handleLikeClick={() => handleLikeClick(blog)}
               handleDelete={() => handleDelete(blog)}
             />

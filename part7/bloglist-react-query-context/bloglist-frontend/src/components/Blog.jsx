@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { useUserValue } from '../UserContext'
 
-const Blog = ({ blog, user, handleLikeClick, handleDelete }) => {
+// TODO: Use the User context here
+const Blog = ({ blog, handleLikeClick, handleDelete }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -9,6 +11,7 @@ const Blog = ({ blog, user, handleLikeClick, handleDelete }) => {
     marginBottom: 5,
   }
 
+  const user = useUserValue()
   const [visible, setVisible] = useState(false)
   const belongsToUser = blog.user && blog.user.username === user.username
 
