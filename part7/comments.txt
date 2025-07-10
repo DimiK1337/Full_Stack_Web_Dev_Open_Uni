@@ -1,1 +1,1 @@
-The exercises are done in: part7/routed-anecdotes, part7/country-hook, part7/ultimate-hook
+The exercises are done in: part7/routed-anecdotes, part7/country-hook, part7/ultimate-hook. I am trying to maximize my learning, so I will do both the Redux and ReactQuery/Context exercises. I have made these folders: part7/bloglist-redux bloglist and part7/bloglist-react-query-context . 

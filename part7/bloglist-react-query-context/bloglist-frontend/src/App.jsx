@@ -8,7 +8,9 @@ import {
 
 // Components
 import Togglable from './components/Togglable'
-import BlogDisplay from './components/BlogDisplay'
+import BlogList from './components/BlogList'
+import BlogView from './components/BlogView'
+import Blog from './components/Blog'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 
@@ -23,6 +25,7 @@ import loginService from './services/login'
 import { useNotificationDispatch } from './NotificationContext'
 import UserContext from './UserContext'
 import useUserMap from './hooks/useUserMap'
+
 
 
 const App = () => {
@@ -91,8 +94,13 @@ const App = () => {
   const users = useUserMap(blogs)
 
   const userMatch = useMatch('/users/:id')
-  const foundUser = userMatch
+  const foundUser = userMatch && users
     ? users.find(user => user.id === userMatch.params.id)
+    : null
+
+  const blogMatch = useMatch('/blogs/:id')
+  const foundBlog = blogMatch && blogs
+    ? blogs.find(blog => blog.id === blogMatch.params.id)
     : null
 
   // Event handlers
@@ -158,12 +166,10 @@ const App = () => {
   }
 
   // Custom Routes
-  const blogDisplayProps = {
+  const blogListProps = {
     blogs,
     blogFormRef,
-    handleCreateBlog,
-    handleLikeClick,
-    handleDelete
+    handleCreateBlog
   }
 
   return (
@@ -191,9 +197,19 @@ const App = () => {
         )
       }
       <Routes>
-        <Route path='/' element={<BlogDisplay {...blogDisplayProps} />} />
+        <Route path='/' element={<BlogList
+          blogs={blogs}
+          blogFormRef={blogFormRef}
+          handleCreateBlog={handleCreateBlog} />}
+        />
         <Route path='/users' element={<Users blogs={blogs} />} />
         <Route path='/users/:id' element={<User user={foundUser} />} />
+        <Route path='/blogs/:id' element={<Blog
+          user={user}
+          blog={foundBlog}
+          handleDelete={() => handleDelete(foundBlog)}
+          handleLikeClick={() => handleLikeClick(foundBlog)} />}
+        />
       </Routes>
     </div>
   )

@@ -1,33 +1,28 @@
-import { useState } from 'react'
+import { useSelector } from 'react-redux'
 
-const Blog = ({ blog, user, handleLikeClick, handleDelete }) => {
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
-  }
+// TODO: Fix the props
+const Blog = ({ blog, handleLikeClick, handleDelete }) => {
+  const loggedInUser = useSelector(state => state.user)
+  const belongsToUser = loggedInUser && blog.user && blog.user.username === loggedInUser.username
 
-  const [visible, setVisible] = useState(false)
-  const belongsToUser = user && blog.user && blog.user.username === user.username
+  console.log('blog check after refresh', blog)
+  console.log('logged in user', loggedInUser)
 
   return (
-    <div style={blogStyle} className="blog">
-      {blog.title} {blog.author}
-      <button onClick={() => setVisible(!visible)}>
-        {visible ? 'hide' : 'view'}
-      </button>
-      {visible && (
-        <div>
-          <p className="url">{blog.url}</p>
-          <div className="likes">
-            likes {blog.likes}
-            <button onClick={handleLikeClick}>like</button>
-          </div>
-          {belongsToUser && <button onClick={handleDelete}>delete</button>}
+    <div   className="blog">
+      <h2>{blog.title}</h2>
+      <div>
+        <p className="url">{blog.url}</p>
+        <div className="likes">
+          likes {blog.likes}
+          <button onClick={handleLikeClick}>like</button>
         </div>
-      )}
+        <div className='author'>
+          added by {blog.author}
+        </div>
+        {belongsToUser && <button onClick={handleDelete}>delete</button>}
+      </div>
+
     </div>
   )
 }

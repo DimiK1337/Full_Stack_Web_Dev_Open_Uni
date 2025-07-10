@@ -1,38 +1,26 @@
-import { useState } from 'react'
 import { useUserValue } from '../UserContext'
 
-// TODO: Use the User context here
 const Blog = ({ blog, handleLikeClick, handleDelete }) => {
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
-  }
-
-  const user = useUserValue()
-  const [visible, setVisible] = useState(false)
-  const belongsToUser = user && blog.user && blog.user.username === user.username
-
+  const loggedInUser = useUserValue()
+  const belongsToUser = loggedInUser && blog.user && blog.user.username === loggedInUser.username
   return (
-    <div style={blogStyle} className="blog">
-      {blog.title} {blog.author}
-      <button onClick={() => setVisible(!visible)}>
-        {visible ? 'hide' : 'view'}
-      </button>
-      {visible && (
-        <div>
-          <p className="url">{blog.url}</p>
-          <div className="likes">
-            likes {blog.likes}
-            <button onClick={handleLikeClick}>like</button>
-          </div>
-          {belongsToUser && <button onClick={handleDelete}>delete</button>}
+    <div className="blog">
+      <h2>{blog.title}</h2>
+      <div>
+        <p className="url">{blog.url}</p>
+        <div className="likes">
+          likes {blog.likes}
+          <button onClick={handleLikeClick}>like</button>
         </div>
-      )}
+        <div className='author'>
+          added by {blog.author}
+        </div>
+        {belongsToUser && <button onClick={handleDelete}>delete</button>}
+      </div>
+
     </div>
   )
 }
 
 export default Blog
+

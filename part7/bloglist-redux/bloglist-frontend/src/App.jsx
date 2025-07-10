@@ -7,7 +7,8 @@ import {
 
 // Components
 import Togglable from './components/Togglable'
-import BlogDisplay from './components/BlogDisplay'
+import Blog from './components/Blog'
+import BlogList from './components/BlogList'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 import Users from './components/Users'
@@ -38,8 +39,13 @@ const App = () => {
   // Matches for specific routes
   const users = useUserMap(blogs)
   const userMatch = useMatch('/users/:id')
-  const foundUser = userMatch
+  const foundUser = userMatch && users
     ? users.find(user => user.id === userMatch.params.id)
+    : null
+
+  const blogMatch = useMatch('/blogs/:id')
+  const foundBlog = blogMatch && blogs.length > 0
+    ? blogs.find(blog => blog.id === blogMatch.params.id)
     : null
 
   useEffect(() => {
@@ -95,14 +101,6 @@ const App = () => {
     dispatch(deleteBlog(blogToDelete.id))
   }
 
-  // Custom Routes
-  const blogDisplayProps = {
-    blogFormRef,
-    handleCreateBlog,
-    handleLikeClick,
-    handleDelete
-  }
-
   return (
     <div>
       <Notification />
@@ -128,9 +126,28 @@ const App = () => {
         )
       }
       <Routes>
-        <Route path='/' element={<BlogDisplay {...blogDisplayProps} />} />
+        <Route path='/' element={<BlogList
+          blogs={blogs}
+          loggedInUser={user}
+          blogFormRef={blogFormRef}
+          handleCreateBlog={handleCreateBlog} />}
+        />
         <Route path='/users' element={<Users users={users} />} />
         <Route path='/users/:id' element={<User user={foundUser} />} />
+        <Route
+          path='/blogs/:id'
+          element={
+            foundBlog ? (
+              <Blog
+                blog={foundBlog}
+                handleDelete={() => handleDelete(foundBlog)}
+                handleLikeClick={() => handleLikeClick(foundBlog)}
+              />
+            ) : (
+              <div>Loading blog...</div>
+            )
+          }
+        />
       </Routes>
     </div>
   )
