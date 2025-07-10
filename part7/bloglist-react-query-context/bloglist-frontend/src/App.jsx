@@ -48,11 +48,32 @@ const App = () => {
   })
 
   const addBlogMutation = useMutation({
-    mutationFn: async (blog) => await blogService.createBlog(blog),
+    mutationFn: async (newBlog) => await blogService.createBlog(newBlog),
     onSuccess: (newBlog) => {
       //queryClient.invalidateQueries({ queryKey: ['blogs'] })
       const blogs = queryClient.getQueryData(['blogs'])
       queryClient.setQueryData(['blogs'], blogs.concat(newBlog))
+    }
+  })
+
+  const updateBlogMutation = useMutation({
+    mutationFn: async (updatedBlog) => await blogService.updateBlog(updatedBlog.id, updatedBlog),
+    onSuccess: (updatedBlog) => {
+      //queryClient.invalidateQueries({ queryKey: ['blogs'] })
+      const blogs = queryClient.getQueryData(['blogs'])
+      queryClient.setQueryData(['blogs'], blogs.map(blog => blog.id !== updatedBlog.id ? blog : updatedBlog))
+    }
+  })
+
+  const deleteBlogMutation = useMutation({
+    mutationFn: async (id) => {
+      await blogService.deleteBlog(id)
+      return id // Return the id, so it can be passed to onSuccess
+    },
+    onSuccess: (id) => {
+      //queryClient.invalidateQueries({ queryKey: ['blogs'] })
+      const blogs = queryClient.getQueryData(['blogs'])
+      queryClient.setQueryData(['blogs'], blogs.filter(blog => blog.id !== id))
     }
   })
 
@@ -102,28 +123,17 @@ const App = () => {
     addBlogMutation.mutate({ ...blog, likes: 0 })
   }
 
-  const handleLikeClick = async (blogToUpdate) => {
-    const newBlog = {
-      ...blogToUpdate,
-      likes: blogToUpdate.likes + 1,
-      user: blogToUpdate.user.id,
-    }
-
-    // TODO: Use React Query
-    const updatedBlog = await blogService.updateBlog(blogToUpdate.id, newBlog)
-    /* setBlogs(
-      blogs.map((blog) => (blog.id !== updatedBlog.id ? blog : updatedBlog))
-    ) */
-  }
+  const handleLikeClick = async (blogToUpdate) => updateBlogMutation.mutate({
+    ...blogToUpdate,
+    likes: blogToUpdate.likes + 1,
+    user: blogToUpdate.user.id
+  })
 
   // Handle delete
   const handleDelete = async (blogToDelete) => {
     const deleteOk = window.confirm(`delete blog ${blogToDelete.title}`)
     if (!deleteOk) return
-
-    // TODO: Use React Query
-    await blogService.deleteBlog(blogToDelete.id)
-    //setBlogs(blogs.filter((blog) => blogToDelete.id !== blog.id))
+    deleteBlogMutation.mutate(blogToDelete.id)
   }
 
   const blogDisplay = () => {
