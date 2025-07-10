@@ -2,18 +2,18 @@ import { useState, useEffect, useRef, useContext, useMemo } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import {
-  Routes, Route, Link
+  Routes, Route, Link,
+  useMatch
 } from 'react-router-dom'
 
 // Components
 import Togglable from './components/Togglable'
-import BlogList from './components/BlogList'
-import Blog from './components/Blog'
-import BlogForm from './components/BlogForm'
+import BlogDisplay from './components/BlogDisplay'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 
 import Users from './components/Users'
+import User from './components/User'
 
 // Services
 import blogService from './services/blogs'
@@ -22,6 +22,7 @@ import loginService from './services/login'
 // Contexts
 import { useNotificationDispatch } from './NotificationContext'
 import UserContext from './UserContext'
+import useUserMap from './hooks/useUserMap'
 
 
 const App = () => {
@@ -86,6 +87,13 @@ const App = () => {
 
   const blogs = blogQueryResult.data
 
+  // Matches for specific routes
+  const users = useUserMap(blogs)
+
+  const userMatch = useMatch('/users/:id')
+  const foundUser = userMatch
+    ? users.find(user => user.id === userMatch.params.id)
+    : null
 
   // Event handlers
   const setNotification = (message, type = 'success', time = 5) => {
@@ -121,7 +129,7 @@ const App = () => {
     userDispatch({ type: 'REMOVE_USER' })
   }
 
-  const createBlog = async (blog) => {
+  const handleCreateBlog = async (blog) => {
     blogFormRef.current.toggleVisibility()
     setNotification(`Added a new blog titled '${blog.title}' by '${blog.author}'`)
     addBlogMutation.mutate({ ...blog, likes: 0 })
@@ -150,10 +158,10 @@ const App = () => {
   }
 
   // Custom Routes
-  const blogListProps = {
+  const blogDisplayProps = {
     blogs,
     blogFormRef,
-    createBlog,
+    handleCreateBlog,
     handleLikeClick,
     handleDelete
   }
@@ -183,8 +191,9 @@ const App = () => {
         )
       }
       <Routes>
-        <Route path='/' element={<BlogList {...blogListProps} />} />
+        <Route path='/' element={<BlogDisplay {...blogDisplayProps} />} />
         <Route path='/users' element={<Users blogs={blogs} />} />
+        <Route path='/users/:id' element={<User user={foundUser} />} />
       </Routes>
     </div>
   )

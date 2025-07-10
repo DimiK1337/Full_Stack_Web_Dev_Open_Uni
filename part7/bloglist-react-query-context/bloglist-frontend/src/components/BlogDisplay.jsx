@@ -2,17 +2,18 @@ import Blog from './Blog'
 import BlogForm from './BlogForm'
 import Togglable from './Togglable'
 
-const BlogList = ({
+const BlogDisplay = ({
   blogs,
   blogFormRef,
-  createBlog,
+  handleCreateBlog,
   handleLikeClick,
   handleDelete
 }) => {
+
   return (
     <div>
       <Togglable buttonLabel={'new blog'} ref={blogFormRef}>
-        <BlogForm createBlog={createBlog} />
+        <BlogForm handleCreateBlog={handleCreateBlog} />
       </Togglable>
 
       <br />
@@ -32,4 +33,4 @@ const BlogList = ({
   )
 }
 
-export default BlogList
+export default BlogDisplay

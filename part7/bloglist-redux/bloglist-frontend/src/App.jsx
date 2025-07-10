@@ -2,17 +2,16 @@ import { useState, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
-  Routes, Route, Link
+  Routes, Route, useMatch
 } from 'react-router-dom'
 
 // Components
 import Togglable from './components/Togglable'
-import Blog from './components/Blog'
-import BlogList from './components/BlogList'
-import BlogForm from './components/BlogForm'
+import BlogDisplay from './components/BlogDisplay'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 import Users from './components/Users'
+import User from './components/User'
 
 // Services
 import blogService from './services/blogs'
@@ -22,6 +21,7 @@ import loginService from './services/login'
 import { showAndHideNotification } from './reducers/notificationReducer'
 import { initializeBlogs, createBlog, incrementLike, deleteBlog } from './reducers/blogReducer'
 import { setUser, removeUser } from './reducers/userReducer'
+import useUserMap from './hooks/useUserMap'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -34,6 +34,13 @@ const App = () => {
 
   // Refs
   const blogFormRef = useRef()
+
+  // Matches for specific routes
+  const users = useUserMap(blogs)
+  const userMatch = useMatch('/users/:id')
+  const foundUser = userMatch
+    ? users.find(user => user.id === userMatch.params.id)
+    : null
 
   useEffect(() => {
     dispatch(initializeBlogs())
@@ -89,15 +96,12 @@ const App = () => {
   }
 
   // Custom Routes
-  const blogListProps = {
-    blogs,
+  const blogDisplayProps = {
     blogFormRef,
-    createBlog,
+    handleCreateBlog,
     handleLikeClick,
     handleDelete
   }
-
-  console.log('user.name ?????', user)
 
   return (
     <div>
@@ -124,8 +128,9 @@ const App = () => {
         )
       }
       <Routes>
-        <Route path='/' element={<BlogList {...blogListProps} />} />
-        <Route path='/users' element={<Users blogs={blogs} />} />
+        <Route path='/' element={<BlogDisplay {...blogDisplayProps} />} />
+        <Route path='/users' element={<Users users={users} />} />
+        <Route path='/users/:id' element={<User user={foundUser} />} />
       </Routes>
     </div>
   )

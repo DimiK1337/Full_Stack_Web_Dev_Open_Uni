@@ -1,18 +1,21 @@
+import { useSelector } from 'react-redux'
+
 import Blog from './Blog'
 import BlogForm from './BlogForm'
 import Togglable from './Togglable'
 
-const BlogList = ({
-  blogs,
+const BlogDisplay = ({
   blogFormRef,
-  createBlog,
+  handleCreateBlog,
   handleLikeClick,
   handleDelete
 }) => {
+
+  const blogs = useSelector(state => state.blogs)
   return (
     <div>
       <Togglable buttonLabel={'new blog'} ref={blogFormRef}>
-        <BlogForm createBlog={createBlog} />
+        <BlogForm handleCreateBlog={handleCreateBlog} />
       </Togglable>
 
       <br />
@@ -32,4 +35,4 @@ const BlogList = ({
   )
 }
 
-export default BlogList
+export default BlogDisplay

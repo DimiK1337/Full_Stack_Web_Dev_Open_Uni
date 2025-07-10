@@ -1,28 +1,11 @@
-import { useMemo } from 'react'
-
+import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 
+import useUserMap from '../hooks/useUserMap'
+
 const Users = ({ blogs }) => {
-  // Disable the new blog button while in the Users view
 
-  // Store data about the users when the blog list changes
-  const users = useMemo(() => {
-    const userMap = new Map()
-    //if (!blogs) return []
-    blogs.forEach(blog => {
-      const user = blog.user
-      if (!userMap.has(user.id)) {
-        userMap.set(user.id, { ...user, blogs: [blog] })
-      }
-      else {
-        userMap.get(user.id).blogs.push(blog)
-      }
-    })
-    return Array.from(userMap.values())
-  }, [blogs])
-
-  console.log('users ', users)
-
+  const users = useUserMap(blogs)
   return (
     <div>
       <h2>Users</h2>
