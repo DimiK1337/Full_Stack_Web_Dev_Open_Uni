@@ -50,7 +50,7 @@ const typeDefs = `
       city: String!
     ): Person
 
-    editPerson(
+    editNumber(
       name: String!
       phone: String!
     ): Person
@@ -99,7 +99,7 @@ const resolvers = {
       return person
     },
 
-    editPerson: (root, args) => {
+    editNumber: (root, args) => {
       const person = persons.find(p => p.name === args.name)
       if (!person) return null
       const updatedPerson = { ...person, phone: args.phone }
