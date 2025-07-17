@@ -12,7 +12,7 @@ const PhoneForm = ({ setError }) => {
   const [ changeNumber, result ] = useMutation(EDIT_NUMBER)
 
   useEffect(() => {
-    if (result && result.data.editNumber === null) {
+    if (result && result.data?.editNumber === null) {
       setError('person not found')
     }
   }, [result, result.data, setError])
