@@ -13,13 +13,33 @@ const NewBook = (props) => {
 
   const [, setErrorMessage] = useContext(ErrorContext)
 
-  const [ createBook ] = useMutation(CREATE_BOOK, {
-    refetchQueries: [ { query: ALL_BOOKS }, { query: ALL_AUTHORS } ],
+  const [createBook] = useMutation(CREATE_BOOK, {
+    refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
     onError: (error) => {
       setErrorMessage(error.message)
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
+    },
+    update: (cache, response) => {
+      const addedBook = response.data.addBook
+
+      cache.updateQuery({ query: ALL_BOOKS }, ({ allBooks }) => {
+        return { allBooks: allBooks.concat(addedBook) }
+      })
+
+      cache.updateQuery({ query: ALL_AUTHORS }, ({ allAuthors }) => {
+        const authorExists = allAuthors.find(a => a.name === addedBook.author.name)
+        if (!authorExists) return { allAuthors: allAuthors.concat(addedBook.author) }
+
+        const updatedAuthors = allAuthors.map(a =>
+          a.name !== addedBook.author.name
+            ? a
+            : { ...a, bookCount: a.bookCount + 1 }
+        )
+
+        return { allAuthors: updatedAuthors }
+      })
     }
   })
 
