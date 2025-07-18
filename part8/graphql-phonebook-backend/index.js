@@ -223,7 +223,7 @@ const config = {
   context: async ({ req, res }) => {
     const auth = req ? req.headers.authorization : null
     const authHeaderPrefix = 'Bearer '
-    if (!auth || !auth.startsWith(authHeaderPrefix)) return
+    if (!auth || !auth.startsWith(authHeaderPrefix)) return {}
     const decodedToken = jwt.verify(auth.substring(authHeaderPrefix.length), process.env.JWT_SECRET)
     const currentUser = await User.findById(decodedToken.id).populate('friends')
     return { currentUser }
