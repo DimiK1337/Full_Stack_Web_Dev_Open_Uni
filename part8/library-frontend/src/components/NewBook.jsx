@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import { useMutation } from '@apollo/client'
 
 import { CREATE_BOOK, ALL_BOOKS, ALL_AUTHORS } from '../queries'
+import ErrorContext from '../ErrorContext'
 
 const NewBook = (props) => {
   const [title, setTitle] = useState('')
@@ -10,8 +11,16 @@ const NewBook = (props) => {
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
 
+  const [, setErrorMessage] = useContext(ErrorContext)
+
   const [ createBook ] = useMutation(CREATE_BOOK, {
-    refetchQueries: [ { query: ALL_BOOKS }, { query: ALL_AUTHORS } ] 
+    refetchQueries: [ { query: ALL_BOOKS }, { query: ALL_AUTHORS } ],
+    onError: (error) => {
+      setErrorMessage(error.message)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
   })
 
   if (!props.show) {

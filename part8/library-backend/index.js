@@ -1,7 +1,28 @@
+require('dotenv').config()
+
 const { ApolloServer } = require('@apollo/server')
 const { startStandaloneServer } = require('@apollo/server/standalone')
+const { GraphQLError } = require('graphql')
 
-const { v1: uuid } = require('uuid')
+const mongoose = require('mongoose')
+const Book = require('./models/Book')
+const Author = require('./models/Author')
+
+
+// MongoDB connection
+const MONGODB_URI = process.env.MONGODB_URI
+console.log(`Connecting to ${MONGODB_URI}`)
+mongoose.set('strictQuery', false)
+mongoose
+  .connect(MONGODB_URI)
+  .then(() => {
+    console.log('Connected to MongoDB')
+  })
+  .catch((error) => {
+    console.log('error connection to MongoDB:', error.message)
+  })
+
+// GraphQL
 
 let authors = [
   {
@@ -19,29 +40,15 @@ let authors = [
     id: "afa5b6f1-344d-11e9-a414-719c6709cf3e",
     born: 1821
   },
-  { 
+  {
     name: 'Joshua Kerievsky', // birthyear not known
     id: "afa5b6f2-344d-11e9-a414-719c6709cf3e",
   },
-  { 
+  {
     name: 'Sandi Metz', // birthyear not known
     id: "afa5b6f3-344d-11e9-a414-719c6709cf3e",
   },
 ]
-
-/*
- * Suomi:
- * Saattaisi olla järkevämpää assosioida kirja ja sen tekijä tallettamalla kirjan yhteyteen tekijän nimen sijaan tekijän id
- * Yksinkertaisuuden vuoksi tallennamme kuitenkin kirjan yhteyteen tekijän nimen
- *
- * English:
- * It might make more sense to associate a book with its author by storing the author's id in the context of the book instead of the author's name
- * However, for simplicity, we will store the author's name in connection with the book
- *
- * Spanish:
- * Podría tener más sentido asociar un libro con su autor almacenando la id del autor en el contexto del libro en lugar del nombre del autor
- * Sin embargo, por simplicidad, almacenaremos el nombre del autor en conexión con el libro
-*/
 
 let books = [
   {
@@ -71,7 +78,7 @@ let books = [
     author: 'Joshua Kerievsky',
     id: "afa5de01-344d-11e9-a414-719c6709cf3e",
     genres: ['refactoring', 'patterns']
-  },  
+  },
   {
     title: 'Practical Object-Oriented Design, An Agile Primer Using Ruby',
     published: 2012,
@@ -99,7 +106,7 @@ const typeDefs = `
   type Book {
     title: String!
     published: Int!
-    author: String!
+    author: Author!
     id: ID!
     genres: [String!]!
   }
@@ -134,38 +141,75 @@ const typeDefs = `
 
 const resolvers = {
   Author: {
-    bookCount: (root) => books.filter(b => b.author === root.name).length
+    bookCount: async (root) => {
+      const author = await Author.findOne({ name: root.name })
+      if (!author) {
+        throw new GraphQLError(`Author ${root.name} not found`, {
+          code: 'BAD_USER_INPUT',
+          invalidArgs: root.name
+        })
+      }
+      return await Book.countDocuments({ author: author._id })
+    }
+  },
+  Book: {
+    author: async (root) => await Author.findById(root.author)
   },
   Mutation: {
-    addBook: (root, args) => {
-      const book = { ...args, id: uuid() }
-      books = books.concat(book)
-
-      if (!authors.some(a => a.name === book.author)) {
-        authors = authors.concat({ name: book.author })
+    addBook: async (root, args) => {
+      // Check if author exists, if not add to DB
+      let author = await Author.findOne({ name: args.author })
+      if (!author) {
+        author = new Author({ name: args.author })
       }
-      return book
+      await author.save()
+
+      const book = new Book({ ...args, author: author._id })
+      try {
+        await book.save()
+      }
+      catch (error) {
+        throw new GraphQLError('Failed saving book', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.title,
+            error
+          }
+        })
+      }
+      return book.populate('author')
     },
 
-    editAuthor: (root, args) => {
-      const author = authors.find(a => a.name === args.name)
+    editAuthor: async (root, args) => {
+      const author = await Author.findOne({ name: args.name })
       if (!author) return null
-      const updatedAuthor = { ...author, born: args.setBornTo }
-      authors = authors.map(a => a.name === updatedAuthor.name ? updatedAuthor : a)
+      const updatedAuthor = await Author.findByIdAndUpdate(author.id, { born: args.setBornTo }, { new: true, runValidators: true })
       return updatedAuthor
     }
   },
   Query: {
-    bookCount: (root) => books.length,
-    allBooks: (root, args) => books.filter(book => {
-        // No author arg means author is automatically matched, if author arg -> check if book matches
-        const matchesAuthor = !args.author || book.author === args.author 
-        const matchesGenre = !args.genre || book.genres.includes(args.genre)
-        return matchesAuthor && matchesGenre
-      }),
+    bookCount: async (root) => await Book.collection.countDocuments(),
+    allBooks: async (root, args) => {
+      const filter = {}
+      if (args.author) {
+        const author = await Author.findOne({ name: args.author })
+        if (!author) {
+          throw new GraphQLError(`Author '${args.author}' not found`, {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.author
+          })
+        }
+        filter.author = author
+      }
+      if (args.genre) {
+        filter.genres = args.genre
+      }
 
-    authorCount: (root) => authors.length,
-    allAuthors: (root, args) => authors
+      // This avoids the N+1 queries problem, where every author would have to be resolved when making this single query
+      return await Book.find(filter).populate('author')
+    },
+    authorCount: async (root) => await Author.collection.countDocuments(),
+    allAuthors: async (root, args) => await Author.find({})
   }
 }
 

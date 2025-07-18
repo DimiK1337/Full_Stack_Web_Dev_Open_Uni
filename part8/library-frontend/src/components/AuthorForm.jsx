@@ -1,15 +1,24 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import Select from 'react-select'
 import { useMutation } from '@apollo/client'
 
 import { ALL_AUTHORS, EDIT_AUTHOR } from '../queries'
 
+import ErrorContext from '../ErrorContext'
+
 const AuthorForm = ({ authors }) => {
   const [selectedAuthorOption, setSelectedAuthorOption] = useState(null)
   const [born, setBorn] = useState('')
 
+  const [, setErrorMessage] = useContext(ErrorContext)
   const [changeBorn] = useMutation(EDIT_AUTHOR, {
-    refetchQueries: [{ query: ALL_AUTHORS }]
+    refetchQueries: [{ query: ALL_AUTHORS }],
+    onError: (error) => {
+      setErrorMessage(error.message)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
   })
 
   const submit = (event) => {

@@ -4,9 +4,14 @@ import { useState } from 'react'
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
+import Notification from './components/Notification'
+
+// Context API
+import { ErrorContextProvider } from './ErrorContext'
 
 const App = () => {
   const [page, setPage] = useState('authors')
+  const [errorMessage, setErrorMessage] = useState('')
 
   return (
     <div>
@@ -16,11 +21,14 @@ const App = () => {
         <button onClick={() => setPage('add')}>add book</button>
       </div>
 
-      <Authors show={page === 'authors'} />
+      {/* Created a context to pass the error message to different pages for GraphQL errors */}
+      <ErrorContextProvider errorMessage={errorMessage} setErrorMessage={setErrorMessage}>
+        <Notification errorMessage={errorMessage} />
+        <Authors show={page === 'authors'} />
+        <Books show={page === 'books'} />
+        <NewBook show={page === 'add'} />
+      </ErrorContextProvider>
 
-      <Books show={page === 'books'} />
-
-      <NewBook show={page === 'add'} />
     </div>
   );
 };
