@@ -60,9 +60,36 @@ const EDIT_AUTHOR = gql`
   }
 `
 
+// Auth mutations
+
+const CREATE_USER = gql`
+  mutation createUser(
+    $username: String!
+    $favoriteGenre: String!
+  ){
+    createUser(username: $username, favoriteGenre: $favoriteGenre) {
+        username,
+        favoriteGenre
+      }
+    }
+`
+
+const LOGIN = gql`
+  mutation login(
+    $username: String!
+    $password: String!
+  ){
+    login(username: $username, password: $password) {
+        value
+      }
+    }
+`
+
 export {
   ALL_AUTHORS,
   ALL_BOOKS,
   CREATE_BOOK,
-  EDIT_AUTHOR
+  EDIT_AUTHOR,
+  CREATE_USER,
+  LOGIN
 }
