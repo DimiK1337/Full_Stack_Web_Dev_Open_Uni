@@ -61,6 +61,15 @@ const EDIT_AUTHOR = gql`
   }
 `
 
+const ME = gql`
+  query currentUser {
+    me {
+      username,
+      favoriteGenre
+    }
+  }
+`
+
 // Auth mutations
 
 const CREATE_USER = gql`
@@ -91,6 +100,7 @@ export {
   ALL_BOOKS,
   CREATE_BOOK,
   EDIT_AUTHOR,
+  ME,
   CREATE_USER,
   LOGIN
 }

@@ -7,6 +7,7 @@ import Notification from './components/Notification'
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
+import Recommendations from './components/Recommendations'
 
 // Context API
 import { ErrorContextProvider } from './ErrorContext'
@@ -25,8 +26,6 @@ const App = () => {
   }
 
   const logout = () => {
-    console.log('logout pressed')
-
     setToken(null)
     localStorage.removeItem('library-user-token')
     console.log('logout pressed, localstore lib-user-toekn=', localStorage.getItem('library-user-token'))
@@ -43,6 +42,7 @@ const App = () => {
           ? (
             <>
               <button onClick={() => setPage('add')}>add book</button>
+              <button onClick={() => setPage('recommendations')}>recommendations</button>
               <button onClick={logout}>logout</button>
             </>
           )
@@ -60,6 +60,7 @@ const App = () => {
         <Authors show={page === 'authors'} token={token} />
         <Books show={page === 'books'} />
         <NewBook show={page === 'add'} />
+        <Recommendations show={page === 'recommendations'} />
         <LoginForm
           show={page === 'login'}
           setToken={setToken}

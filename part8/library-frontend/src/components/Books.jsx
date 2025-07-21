@@ -27,8 +27,6 @@ const Books = (props) => {
     if (!uniqueGenres.includes(genreFilter) || genreFilter === 'all-genres') return books
     return books.filter(b => b.genres.includes(genreFilter))
   }
-
-  console.log('genre is ', genre)
   
   return (
     <div>
