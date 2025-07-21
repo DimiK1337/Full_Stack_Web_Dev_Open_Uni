@@ -5,7 +5,7 @@ import { ALL_BOOKS } from '../queries'
 
 const Books = (props) => {
 
-  const [genre, setGenre] = useState('')
+  const [genre, setGenre] = useState('all-genres')
 
   const allBooksResult = useQuery(ALL_BOOKS)
   const filteredBooksResult = useQuery(ALL_BOOKS, {
@@ -16,8 +16,8 @@ const Books = (props) => {
 
   if (filteredBooksResult.loading || allBooksResult.loading) return <div>Loading books...</div>
 
-  const allBooks = allBooksResult.data.allBooks
-  const filteredBooks = filteredBooksResult.data.allBooks
+  const allBooks = allBooksResult.data.allBooks || []
+  const filteredBooks = filteredBooksResult.data?.allBooks || []
   console.log('books in Books comp', filteredBooks)
 
   const uniqueGenres = allBooks.reduce((acc, cur) => {

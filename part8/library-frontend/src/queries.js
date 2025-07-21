@@ -43,6 +43,7 @@ const CREATE_BOOK = gql`
         born,
         bookCount
       }, 
+      genres,
       published  
     }
   }
