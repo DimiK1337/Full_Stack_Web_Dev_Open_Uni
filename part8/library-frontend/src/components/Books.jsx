@@ -5,34 +5,34 @@ import { ALL_BOOKS } from '../queries'
 
 const Books = (props) => {
 
-  const [genre, setGenre] = useState('all-genres')
-  const result = useQuery(ALL_BOOKS)
+  const [genre, setGenre] = useState('')
+
+  const allBooksResult = useQuery(ALL_BOOKS)
+  const filteredBooksResult = useQuery(ALL_BOOKS, {
+    variables: { genre: genre }
+  })
 
   if (!props.show) return null
 
-  if (result.loading) return <div>Loading books...</div>
+  if (filteredBooksResult.loading || allBooksResult.loading) return <div>Loading books...</div>
 
-  const books = result.data.allBooks
-  console.log('books in Books comp', books)
+  const allBooks = allBooksResult.data.allBooks
+  const filteredBooks = filteredBooksResult.data.allBooks
+  console.log('books in Books comp', filteredBooks)
 
-  const uniqueGenres = books.reduce((acc, cur) => {
+  const uniqueGenres = allBooks.reduce((acc, cur) => {
     cur.genres.forEach(genre => {
       if (!acc.includes(genre)) acc.unshift(genre)
     })
     return acc
   }, ['all-genres'])
 
-
-  const filteredBooks = (genreFilter) => {
-    if (!uniqueGenres.includes(genreFilter) || genreFilter === 'all-genres') return books
-    return books.filter(b => b.genres.includes(genreFilter))
-  }
   
   return (
     <div>
       <h2>books</h2>
 
-      {(genre !== 'all-genres') && <p>in genre <b>{genre}</b></p>}
+      {(genre !== 'all-genres' && genre !== '') && <p>in genre <b>{genre}</b></p>}
 
       <table>
         <tbody>
@@ -41,7 +41,7 @@ const Books = (props) => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {filteredBooks(genre).map((b) => (
+          {filteredBooks.map((b) => (
             <tr key={b.title}>
               <td>{b.title}</td>
               <td>{b.author.name}</td>
@@ -56,7 +56,7 @@ const Books = (props) => {
           <button 
             key={genre}
             value={genre}
-            onClick={({ target }) => setGenre(target.value)}
+            onClick={({ target }) => setGenre(target.value === 'all-genres' ? '' : target.value)}
           >
             {genre}
           </button>

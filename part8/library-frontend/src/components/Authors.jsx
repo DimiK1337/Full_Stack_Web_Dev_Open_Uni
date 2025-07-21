@@ -8,13 +8,9 @@ import AuthorForm from './AuthorForm'
 const Authors = (props) => {
   const result = useQuery(ALL_AUTHORS)
 
-  if (!props.show) {
-    return null
-  }
+  if (!props.show) return null
 
-  if (result.loading) {
-    return <div>Loading authors...</div>
-  }
+  if (result.loading) return <div>Loading authors...</div>
 
   const authors = result.data.allAuthors
 
