@@ -9,18 +9,6 @@ const { PubSub } = require('graphql-subscriptions')
 const pubSub = new PubSub()
 
 const resolvers = {
-  Author: {
-    bookCount: async (root) => {
-      const author = await Author.findOne({ name: root.name })
-      if (!author) {
-        throw new GraphQLError(`Author ${root.name} not found`, {
-          code: 'BAD_USER_INPUT',
-          invalidArgs: root.name
-        })
-      }
-      return await Book.countDocuments({ author: author._id })
-    }
-  },
   Book: {
     author: async (root) => await Author.findById(root.author)
   },
@@ -134,7 +122,22 @@ const resolvers = {
       return await Book.find(filter).populate('author')
     },
     authorCount: async (root) => await Author.collection.countDocuments(),
-    allAuthors: async (root, args) => await Author.find({})
+    allAuthors: async (root, args) => {
+      const authors = await Author.find({})
+      
+      // Group the books by author id and get a count
+      const books = await Book.find({})
+      const bookCount = books.reduce((acc, book) => {
+        const id = book.author.toString()
+        acc[id] = (acc[id] || 0) + 1
+        return acc
+      }, {})
+
+      return authors.map(author => ({
+        ...author.toObject(),
+        bookCount: bookCount[author._id.toString()] || 0
+      }))
+    }
   },
 
   Subscription: {
