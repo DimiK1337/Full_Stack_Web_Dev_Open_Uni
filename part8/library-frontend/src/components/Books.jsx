@@ -15,8 +15,8 @@ const Books = (props) => {
   if (!props.show) return null
 
 
-  const allBooks = allBooksResult.data.allBooks //|| []
-  const filteredBooks = filteredBooksResult.data?.allBooks // || []
+  const allBooks = allBooksResult.data.allBooks || []
+  const filteredBooks = filteredBooksResult.data?.allBooks || []
   console.log('books in Books comp', filteredBooks)
 
   if (filteredBooksResult.loading || allBooksResult.loading) return <div>Loading books...</div>

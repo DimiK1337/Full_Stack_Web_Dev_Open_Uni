@@ -3,6 +3,7 @@ import { useMutation } from '@apollo/client'
 
 import { CREATE_BOOK, ALL_BOOKS, ALL_AUTHORS } from '../queries'
 import ErrorContext from '../ErrorContext'
+import { uniqByProp } from '../utils'
 
 const NewBook = (props) => {
   const [title, setTitle] = useState('')
@@ -25,7 +26,11 @@ const NewBook = (props) => {
       const addedBook = response.data.addBook
 
       cache.updateQuery({ query: ALL_BOOKS }, ({ allBooks }) => {
-        return { allBooks: allBooks.concat(addedBook) }
+        return { allBooks: uniqByProp(allBooks.concat(addedBook), 'title') }
+      })
+      
+      cache.updateQuery({ query: ALL_BOOKS, variables: { genre: '' } }, ({ allBooks }) => {
+        return { allBooks: uniqByProp(allBooks.concat(addedBook), 'title') }
       })
 
       cache.updateQuery({ query: ALL_AUTHORS }, ({ allAuthors }) => {
@@ -43,9 +48,7 @@ const NewBook = (props) => {
     }
   })
 
-  if (!props.show) {
-    return null
-  }
+  if (!props.show) return null
 
   const submit = async (event) => {
     event.preventDefault()

@@ -13,7 +13,8 @@ import Recommendations from './components/Recommendations'
 import { ErrorContextProvider } from './ErrorContext'
 
 // GraphQL
-import { BOOK_ADDED } from './queries'
+import { ALL_BOOKS, BOOK_ADDED } from './queries'
+import { uniqByProp } from './utils'
 
 const App = () => {
   const client = useApolloClient()
@@ -22,11 +23,18 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState('')
 
   useSubscription(BOOK_ADDED, {
-    onData: ({ data }) => {
-      const addedBook = data.data.bookAdded
-      console.log('addedBook', addedBook);
-      
+    onData: ({ data, client }) => {
+      const addedBook = data.data.bookAdded      
       notification(`New book: ${addedBook.title} by ${addedBook.author.name}`)
+
+      // Update the cache for the books and authors
+      client.cache.updateQuery({ query: ALL_BOOKS }, ({ allBooks }) => {
+        return { allBooks: uniqByProp(allBooks.concat(addedBook), "title") }
+      })
+
+      client.cache.updateQuery({ query: ALL_BOOKS, variables: { genre: '' } }, ({ allBooks }) => {
+        return { allBooks: uniqByProp(allBooks.concat(addedBook), "title") }
+      })
     }
   })
 
