@@ -5,20 +5,21 @@ import { ALL_BOOKS } from '../queries'
 
 const Books = (props) => {
 
-  const [genre, setGenre] = useState('all-genres')
+  const [genre, setGenre] = useState('')
 
   const allBooksResult = useQuery(ALL_BOOKS)
   const filteredBooksResult = useQuery(ALL_BOOKS, {
-    variables: { genre: genre }
+    variables: { genre: genre },
   })
 
   if (!props.show) return null
 
-  if (filteredBooksResult.loading || allBooksResult.loading) return <div>Loading books...</div>
 
-  const allBooks = allBooksResult.data.allBooks || []
-  const filteredBooks = filteredBooksResult.data?.allBooks || []
+  const allBooks = allBooksResult.data.allBooks //|| []
+  const filteredBooks = filteredBooksResult.data?.allBooks // || []
   console.log('books in Books comp', filteredBooks)
+
+  if (filteredBooksResult.loading || allBooksResult.loading) return <div>Loading books...</div>
 
   const uniqueGenres = allBooks.reduce((acc, cur) => {
     cur.genres.forEach(genre => {
