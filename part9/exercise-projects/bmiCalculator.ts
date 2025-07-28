@@ -33,14 +33,21 @@ const calculateBmi = (height: number, weight: number): string => {
   return "Obese (Class III)";
 }
 
-try {
-  const { height, weight } = parseArgs(process.argv)
-  const res = calculateBmi(height, weight)
-  console.log(res)
-} catch (error: unknown) {
-  let errorMessage = 'Something bad happened. '
-  if (error instanceof Error) {
-    errorMessage += error.message
+
+if (require.main === module) {
+  // this file/module was run from the CLI as in node xxx.ts
+  try {
+    const { height, weight } = parseArgs(process.argv)
+    const res = calculateBmi(height, weight)
+    console.log(res)
+  } catch (error: unknown) {
+    let errorMessage = 'Something bad happened. '
+    if (error instanceof Error) {
+      errorMessage += error.message
+    }
+    console.log(errorMessage)
   }
-  console.log(errorMessage)
+
 }
+
+export default calculateBmi
