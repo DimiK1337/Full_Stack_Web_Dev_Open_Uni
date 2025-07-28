@@ -1,3 +1,5 @@
+import { isNotNumber } from "./utils";
+
 type Rating = 1 | 2 | 3
 
 interface Result {
@@ -10,8 +12,23 @@ interface Result {
   average: number;
 }
 
+interface CalculateExerciseValues {
+  weekly_hours: number[];
+  target: number;
+}
+
+
+const parseArgs = (args: string[]): CalculateExerciseValues => {
+  if (args.length < 4) throw new Error('Not enough arguments');
+  return {
+    target: Number(args[2]),
+    weekly_hours: args.slice(3).map(Number)
+  }
+}
+
+
 const calculateExercises = (weekly_hours: number[], target: number): Result => {
-  const average =  weekly_hours.reduce((acc, cur) => acc + cur, 0) / weekly_hours.length;
+  const average = weekly_hours.reduce((acc, cur) => acc + cur, 0) / weekly_hours.length;
 
   let rating: Rating = 1;
   let ratingDescription: string = "You need to work much harder!";
@@ -26,16 +43,26 @@ const calculateExercises = (weekly_hours: number[], target: number): Result => {
   }
 
   return {
+    success: average >= target,
     periodLength: weekly_hours.length,
     trainingDays: weekly_hours.filter(h => h !== 0).length,
     target,
     average,
-    success: average >= target,
     rating,
     ratingDescription
   }
 }
 
 
-const res = calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2);
-console.log('res', res);
+try {
+  const { weekly_hours, target } = parseArgs(process.argv);
+  const res = calculateExercises(weekly_hours, target);
+  console.log(res);
+}
+catch (error: unknown) {
+  let errorMessage = 'Something bad happened: ';
+  if (error instanceof Error) {
+    errorMessage += error.message;
+  }
+  console.log(errorMessage);
+}
