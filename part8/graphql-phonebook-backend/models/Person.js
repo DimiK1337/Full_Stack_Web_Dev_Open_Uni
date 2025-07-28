@@ -18,7 +18,13 @@ const personSchema = mongoose.Schema({
   city: {
     type: String,
     minLength: 3
-  }
+  },
+  friendOf: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }
+  ]
 })
 
 module.exports = mongoose.model('Person', personSchema)

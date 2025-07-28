@@ -6,6 +6,8 @@ import {
   ALL_PERSONS 
 } from '../queries'
 
+import { updateCache } from '../App'
+
 const PersonForm = ({ setError }) => {
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
@@ -23,11 +25,12 @@ const PersonForm = ({ setError }) => {
 
       // 1st param — Update the cached result of the ALL_PERSONS query
       // 2nd param — Contains the current cache of the specified query in the 1st param (The previous result of calling the ALL_PERSONS query)
-      cache.updateQuery({ query: ALL_PERSONS}, ({ allPersons }) => {
+      /* cache.updateQuery({ query: ALL_PERSONS}, ({ allPersons }) => {
         return {
           allPersons: allPersons.concat(response.data.addPerson)
         }
-      })
+      }) */
+      updateCache(cache, { query: ALL_PERSONS }, response.data.addPerson)
     },
   })
 
