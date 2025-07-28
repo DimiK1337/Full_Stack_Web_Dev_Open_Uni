@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useApolloClient } from '@apollo/client'
+import { useApolloClient, useSubscription } from '@apollo/client'
 
 // Components
 import LoginForm from './components/LoginForm'
@@ -12,11 +12,23 @@ import Recommendations from './components/Recommendations'
 // Context API
 import { ErrorContextProvider } from './ErrorContext'
 
+// GraphQL
+import { BOOK_ADDED } from './queries'
+
 const App = () => {
   const client = useApolloClient()
   const [token, setToken] = useState(null)
   const [page, setPage] = useState('authors')
   const [errorMessage, setErrorMessage] = useState('')
+
+  useSubscription(BOOK_ADDED, {
+    onData: ({ data }) => {
+      const addedBook = data.data.bookAdded
+      console.log('addedBook', addedBook);
+      
+      notification(`New book: ${addedBook.title} by ${addedBook.author.name}`)
+    }
+  })
 
   const notification = (message) => {
     setErrorMessage(message)
@@ -28,7 +40,6 @@ const App = () => {
   const logout = () => {
     setToken(null)
     localStorage.removeItem('library-user-token')
-    console.log('logout pressed, localstore lib-user-toekn=', localStorage.getItem('library-user-token'))
     client.clearStore()
     setPage('authors')
   }
