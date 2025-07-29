@@ -1,6 +1,7 @@
 import express, { Response } from 'express';
 import patientService from '../services/patientService';
-import { NewPatient, NonSensitivePatient, Patient } from '../types';
+import { NonSensitivePatient, Patient } from '../types';
+import { toNewPatient } from '../utils';
 
 const router = express.Router();
 
@@ -10,7 +11,7 @@ router.get('/', (_req, res: Response<NonSensitivePatient[]>) => {
 
 router.post('/', (req, res: Response<Patient | string>) => {
   try {
-    const newPatient = req.body as NewPatient;
+    const newPatient = toNewPatient(req.body);
     const patient = patientService.addPatient(newPatient);
     res.json(patient);
   }
