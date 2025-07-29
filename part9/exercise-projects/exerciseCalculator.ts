@@ -1,6 +1,6 @@
 import { isNotNumber } from "./utils";
 
-type Rating = 1 | 2 | 3
+type Rating = 1 | 2 | 3;
 
 interface Result {
   periodLength: number;
@@ -24,8 +24,8 @@ const parseArgs = (args: string[]): CalculateExerciseValues => {
   return {
     target: Number(args[2]),
     weekly_hours: args.slice(3).map(Number)
-  }
-}
+  };
+};
 
 
 const calculateExercises = (weekly_hours: number[], target: number): Result => {
@@ -35,11 +35,11 @@ const calculateExercises = (weekly_hours: number[], target: number): Result => {
   let ratingDescription: string = "You need to work much harder!";
 
   if (average >= target) {
-    rating = 3
+    rating = 3;
     ratingDescription = "Great job! Target met!";
   }
   else if (average >= target * 0.75) {
-    rating = 2
+    rating = 2;
     ratingDescription = "Not too bad but could be better";
   }
 
@@ -51,8 +51,8 @@ const calculateExercises = (weekly_hours: number[], target: number): Result => {
     average,
     rating,
     ratingDescription
-  }
-}
+  };
+};
 
 
 try {
