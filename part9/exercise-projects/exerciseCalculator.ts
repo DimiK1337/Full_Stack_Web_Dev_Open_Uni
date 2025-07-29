@@ -20,6 +20,7 @@ interface CalculateExerciseValues {
 
 const parseArgs = (args: string[]): CalculateExerciseValues => {
   if (args.length < 4) throw new Error('Not enough arguments');
+  if (args.slice(2).some(a => isNotNumber(a))) throw new Error('malformatted parameters');
   return {
     target: Number(args[2]),
     weekly_hours: args.slice(3).map(Number)
