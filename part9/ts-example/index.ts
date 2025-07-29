@@ -17,7 +17,6 @@ app.post('/calculate', (req, res) => {
   if (!a || isNaN(Number(a)))  return res.status(400).send({ error: 'a needs to be a number'});
   if (!b || isNaN(Number(b)))  return res.status(400).send({ error: 'b needs to be a number'});
 
-
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const result = calculator(
     Number(a), Number(b), op as Operation
