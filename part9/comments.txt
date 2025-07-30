@@ -1,1 +1,1 @@
-The exercises for part 9 are found in: part9/exercise-projects
+The exercises for part 9 are found in: part9/exercise-projects, part9/patientor, part9/courseinfo, part9/flight-diaries
