@@ -3,6 +3,8 @@ import { useState } from 'react';
 
 import { createDiaryEntry } from '../services/diaryService';
 import type { NonSensitiveDiaryEntry } from '../types';
+import Notification from './Notification';
+import axios from 'axios';
 
 
 interface AddEntryProps {
@@ -10,7 +12,8 @@ interface AddEntryProps {
 };
 
 const AddEntry = ({ setDiaryEntries }: AddEntryProps) => {
-  const [date, setDate] = useState(new Date().toLocaleDateString());
+  const [errorMessage, setErrorMessage] = useState('')
+  const [date, setDate] = useState('');
   const [visibility, setVisibility] = useState('');
   const [weather, setWeather] = useState('');
   const [comment, setComment] = useState('');
@@ -27,14 +30,27 @@ const AddEntry = ({ setDiaryEntries }: AddEntryProps) => {
       visibility,
       comment
     };
-    const res = await createDiaryEntry(newEntry);
-    setDiaryEntries(prevState => [...prevState, res])
+
+    try {
+      const res = await createDiaryEntry(newEntry);
+      setDiaryEntries(prevState => [...prevState, res])
+    }
+    catch (e: unknown) {      
+      if (axios.isAxiosError(e) && e.response?.data) {
+        setErrorMessage(`Error: ${e.response.data.error[0].message}`)
+      }
+      else {
+        setErrorMessage(`Unknown Error`)
+      }
+    }
+    
   };
 
 
   return (
     <div>
       <h1>Add entry</h1>
+      {errorMessage && <Notification message={errorMessage} />}
       <form onSubmit={submitEntry}>
         <p>
           Date: <input
