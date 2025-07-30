@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { getAllDiaryEntries } from './services/diaryService';
 
 // Components
+import AddEntry from './components/AddEntry';
 import Entries from './components/Entries';
 
 const App = () => {
@@ -21,10 +22,9 @@ const App = () => {
 
   return (
     <div>
-      <h1>Diary Entries</h1>
-      <div>
-        <Entries entries={diaryEntries}/>
-      </div>
+      <AddEntry setDiaryEntries={setDiaryEntries}/>
+      <hr />
+      <Entries entries={diaryEntries} />
     </div>
   )
 };
