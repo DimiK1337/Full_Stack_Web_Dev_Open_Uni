@@ -2,7 +2,7 @@
 import { useState } from 'react';
 
 import { createDiaryEntry } from '../services/diaryService';
-import type { NonSensitiveDiaryEntry } from '../types';
+import type { NonSensitiveDiaryEntry, Visibility, Weather } from '../types';
 import Notification from './Notification';
 import axios from 'axios';
 
@@ -14,8 +14,8 @@ interface AddEntryProps {
 const AddEntry = ({ setDiaryEntries }: AddEntryProps) => {
   const [errorMessage, setErrorMessage] = useState('')
   const [date, setDate] = useState('');
-  const [visibility, setVisibility] = useState('');
-  const [weather, setWeather] = useState('');
+  const [visibility, setVisibility] = useState<Visibility | ''>('');
+  const [weather, setWeather] = useState<Weather | ''>('');
   const [comment, setComment] = useState('');
 
   const weatherTypes = ['sunny', 'rainy', 'cloudy', 'stormy', 'windy'];
@@ -35,7 +35,7 @@ const AddEntry = ({ setDiaryEntries }: AddEntryProps) => {
       const res = await createDiaryEntry(newEntry);
       setDiaryEntries(prevState => [...prevState, res])
     }
-    catch (e: unknown) {      
+    catch (e: unknown) {
       if (axios.isAxiosError(e) && e.response?.data) {
         setErrorMessage(`Error: ${e.response.data.error[0].message}`)
       }
@@ -43,7 +43,7 @@ const AddEntry = ({ setDiaryEntries }: AddEntryProps) => {
         setErrorMessage(`Unknown Error`)
       }
     }
-    
+
   };
 
 
@@ -63,27 +63,31 @@ const AddEntry = ({ setDiaryEntries }: AddEntryProps) => {
         <div>
           Weather:
           {weatherTypes.map(t => <>
-            <input
-              type="radio"
-              name="weather"
-              id={t}
-              value={t}
-              onChange={() => setWeather(t)}
-            />
-            <label htmlFor={t}>{t}</label>
+            <div key={t}>
+              <input
+                type="radio"
+                name="weather"
+                id={t}
+                value={t}
+                onChange={() => setWeather(t as Weather)}
+              />
+              <label htmlFor={t}>{t}</label>
+            </div>
           </>)}
         </div>
         <div>
           Visibility:
           {visibilityTypes.map(t => <>
-            <input
-              type="radio"
-              name="visibility"
-              id={t}
-              value={t}
-              onChange={() => setVisibility(t)}
-            />
-            <label htmlFor={t}>{t}</label>
+            <div key={t}>
+              <input
+                type="radio"
+                name="visibility"
+                id={t}
+                value={t}
+                onChange={() => setVisibility(t as Visibility)}
+              />
+              <label htmlFor={t}>{t}</label>
+            </div>
           </>)}
         </div>
         <p>
