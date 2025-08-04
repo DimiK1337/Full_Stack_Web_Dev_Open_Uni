@@ -1,6 +1,6 @@
 
 import type { Entry, Patient } from "../../types";
-import { Gender } from "../../types";
+import { Diagnosis, Gender } from "../../types";
 
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
@@ -16,13 +16,9 @@ import FemaleIcon from '@mui/icons-material/Female';
 import MaleIcon from '@mui/icons-material/Male';
 import TransgenderIcon from '@mui/icons-material/Transgender';
 
-import patientService from "../../services/patients";
-import axios from "axios";
+import patientService from '../../services/patients';
+import diagnosisService from '../../services/diagnoses';
 
-
-interface Props {
-  //patient: Patient | null | undefined;
-}
 
 const genderIcon = (gender: Gender) => {
   switch (gender) {
@@ -35,11 +31,12 @@ const genderIcon = (gender: Gender) => {
   }
 };
 
-const PatientViewPage = (props: Props) => {
+const PatientViewPage = () => {
   //if (!patient) return <div>Patient not found</div>;
 
   const { id } = useParams<{ id: string }>();
   const [patient, setPatient] = useState<Patient | null>(null);
+  const [diagnoses, setDiagnoses] = useState<Diagnosis[]>([]);
 
   useEffect(() => {
     const fetchPatient = async () => {
@@ -50,7 +47,20 @@ const PatientViewPage = (props: Props) => {
     fetchPatient();
   }, [id]);
 
+  useEffect(() => {
+    const fetchDiagnoses = async () => {
+      const data = await diagnosisService.getAll();
+      setDiagnoses(data);
+    };
+    fetchDiagnoses();
+  }, []);
+
   if (!patient) return <div>No patient found</div>;
+
+  const getDiagnosisCodeDescription = (code: string) => {
+    const diagnosis = diagnoses.find(d => d.code === code);
+    return diagnosis?.name ?? '';
+  };
 
   const renderEntry = (entry: Entry) => {
     return (
@@ -59,12 +69,14 @@ const PatientViewPage = (props: Props) => {
           {entry.date} <em>{entry.description}</em>
         </Typography>
         <List>
-          {entry.diagnosisCodes?.map(code => <ListItem>{code}</ListItem>)}
+          {entry.diagnosisCodes?.map(code => <ListItem>{code} {getDiagnosisCodeDescription(code)}</ListItem>)}
         </List>
       </Box>
     );
   };
 
+  console.log('patient.entries', patient.entries);
+  
   return (
     <Box>
       <br />
@@ -81,8 +93,6 @@ const PatientViewPage = (props: Props) => {
       {
         patient.entries.map((entry: Entry) => renderEntry(entry))
       }
-
-
     </Box>
   );
 };
