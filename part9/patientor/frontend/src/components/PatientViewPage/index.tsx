@@ -1,5 +1,5 @@
 
-import type { Patient } from "../../types";
+import type { Entry, Patient } from "../../types";
 import { Gender } from "../../types";
 
 import { useState, useEffect } from "react";
@@ -7,7 +7,9 @@ import { useParams } from "react-router-dom";
 
 import {
   Box,
-  Typography
+  Typography,
+  List,
+  ListItem
 } from '@mui/material';
 
 import FemaleIcon from '@mui/icons-material/Female';
@@ -50,14 +52,37 @@ const PatientViewPage = (props: Props) => {
 
   if (!patient) return <div>No patient found</div>;
 
+  const renderEntry = (entry: Entry) => {
+    return (
+      <Box>
+        <Typography>
+          {entry.date} <em>{entry.description}</em>
+        </Typography>
+        <List>
+          {entry.diagnosisCodes?.map(code => <ListItem>{code}</ListItem>)}
+        </List>
+      </Box>
+    );
+  };
+
   return (
     <Box>
+      <br />
       <Typography variant="h4" gutterBottom>
         {patient.name} {genderIcon(patient.gender)}
       </Typography>
       <br />
       <Typography>ssn: {patient.ssn}</Typography>
       <Typography>occupation: {patient.occupation}</Typography>
+      <br />
+      <Typography variant="h5">
+        entries:
+      </Typography>
+      {
+        patient.entries.map((entry: Entry) => renderEntry(entry))
+      }
+
+
     </Box>
   );
 };
