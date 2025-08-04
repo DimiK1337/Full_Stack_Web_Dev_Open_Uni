@@ -3,8 +3,7 @@ import axios from "axios";
 import {
   Route,
   Link,
-  Routes,
-  useMatch
+  Routes
 } from "react-router-dom";
 import {
   Button,
@@ -22,9 +21,6 @@ import PatientViewPage from "./components/PatientViewPage";
 
 const App = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
-  
-  /* const patientMatch = useMatch('/patients/:id');
-  const patient = patientMatch ? patients.find(p => p.id === patientMatch.params.id) : null; */
 
   useEffect(() => {
     void axios.get<void>(`${apiBaseUrl}/ping`);
