@@ -1,10 +1,12 @@
 import { z } from 'zod';
-import {
+
+import { Gender, HealthCheckRating } from './types';
+import type {
   NewPatient,
-  Gender,
-  HealthCheckRating
+  EntryWithoutId
 } from './types';
 
+/* Entry schemas */
 const baseEntrySchema = z.object({
   id: z.string(),
   description: z.string(),
@@ -26,7 +28,7 @@ const hospitalEntrySchema = baseEntrySchema.extend({
   })
 });
 
-const OccupationalHealthcareEntrySchema = baseEntrySchema.extend({
+const occupationalHealthcareEntrySchema = baseEntrySchema.extend({
   type: z.literal('OccupationalHealthcare'),
   employerName: z.string(),
   sickLeave: z.object({
@@ -39,9 +41,22 @@ const discriminatorKey = 'type';
 const entrySchema = z.discriminatedUnion(discriminatorKey, [
   healthCheckEntrySchema,
   hospitalEntrySchema,
-  OccupationalHealthcareEntrySchema
+  occupationalHealthcareEntrySchema
 ]);
 
+// Entries without an id schemas
+const healthCheckEntryWithoutIdSchema = healthCheckEntrySchema.omit({ id: true });
+const hospitalEntryWithoutIdSchema = hospitalEntrySchema.omit({ id: true });
+const occupationalHealthcareEntryWithoutIdSchema = occupationalHealthcareEntrySchema.omit({ id: true });
+
+const entryWithoutIdSchema = z.discriminatedUnion(discriminatorKey, [
+  healthCheckEntryWithoutIdSchema,
+  hospitalEntryWithoutIdSchema,
+  occupationalHealthcareEntryWithoutIdSchema
+]);
+
+
+// Patient schema
 export const newPatientSchema = z.object({
   name: z.string(),
   dateOfBirth: z.string().date(),
@@ -53,4 +68,8 @@ export const newPatientSchema = z.object({
 
 export const toNewPatient = (object: unknown): NewPatient => {
   return newPatientSchema.parse(object);
+};
+
+export const toNewEntry = (object: unknown): EntryWithoutId => {
+  return entryWithoutIdSchema.parse(object);
 };

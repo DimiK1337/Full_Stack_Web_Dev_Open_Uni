@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import express, { Request, Response, NextFunction } from 'express';
 import patientService from '../services/patientService';
-import { NewPatient, NonSensitivePatient, Patient } from '../types';
+import { Entry, NewPatient, NonSensitivePatient, Patient } from '../types';
 import { newPatientSchema } from '../utils';
 
 const router = express.Router();
@@ -34,6 +34,12 @@ const errorMiddleware = (error: unknown, _req: Request, res: Response, next: Nex
 router.post('/', parseNewPatient, (req: Request<unknown, unknown, NewPatient>, res: Response<Patient>) => {
   const patient = patientService.addPatient(req.body);
   res.json(patient);
+});
+
+router.post('/:id/entries', (req: Request<{ id: string }, unknown, Entry>, res: Response<Entry | { error: string }>) => {
+  const entry = patientService.addPatientEntry(req.params.id, req.body);
+  if (!entry) return res.status(500).send({ error: 'Failed to save entry' });
+  return res.json(entry);
 });
 
 router.use(errorMiddleware);
