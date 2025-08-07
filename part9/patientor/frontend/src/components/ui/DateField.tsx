@@ -19,7 +19,10 @@ const DateField = ({ label, value, setValue }: DateFieldProps) => {
         onChange={(newDate) => {
           setValue(newDate);
         }}
-        renderInput={(params) => <TextField {...params} fullWidth />}
+        renderInput={(params) => <TextField
+          {...params} fullWidth
+          required
+        />}
       />
     </LocalizationProvider>
   );

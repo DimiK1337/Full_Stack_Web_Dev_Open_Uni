@@ -2,7 +2,7 @@
 import type { Entry, Patient } from "../../types";
 import { Gender } from "../../types";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 
 import {
@@ -36,33 +36,34 @@ const PatientViewPage = () => {
   const { id } = useParams<{ id: string }>();
   const [patient, setPatient] = useState<Patient | null>(null);
 
-  useEffect(() => {
-    const fetchPatient = async () => {
-      if (!id || typeof id !== "string") return;
-      const data = await patientService.getPatient(id);
-      setPatient(data);
-    };
-    fetchPatient();
+  const fetchPatient = useCallback(async () => {
+    if (!id || typeof id !== "string") return;
+    const data = await patientService.getPatient(id);
+    setPatient(data);
   }, [id]);
 
-  if (!patient) return <div>No patient found</div>;
-  
+  useEffect(() => {
+    fetchPatient();
+  }, [fetchPatient]);
+
+  if (!patient || !id) return <div>No patient found</div>;
+
   return (
     <Box>
-      <br/>
+      <br />
       <Typography variant="h4" gutterBottom>
         {patient.name} {genderIcon(patient.gender)}
       </Typography>
-      <br/>
+      <br />
       <Typography>ssn: {patient.ssn}</Typography>
       <Typography>occupation: {patient.occupation}</Typography>
-      <br/>
-      <AddEntryForm/>
-      <br/>
+      <br />
+      <AddEntryForm id={id} onEntryAdded={fetchPatient} />
+      <br />
       <Typography variant="h5">
         entries:
       </Typography>
-      { patient.entries.map((entry: Entry, idx: number) => <EntryDetails key={idx} entry={entry}/>) }
+      {patient.entries.map((entry: Entry, idx: number) => <EntryDetails key={idx} entry={entry} />)}
     </Box>
   );
 };
