@@ -48,7 +48,6 @@ const addPatientEntry = (id: string, entryObj: EntryWithoutId) => {
   for (const p of patients) {
     if (p.id === id) {
       p.entries.push(entry);
-      console.log('entry pushed', entry);
       break;
     }
   }  

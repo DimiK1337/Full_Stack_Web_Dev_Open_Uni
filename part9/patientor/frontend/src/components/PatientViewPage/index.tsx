@@ -15,7 +15,10 @@ import MaleIcon from '@mui/icons-material/Male';
 import TransgenderIcon from '@mui/icons-material/Transgender';
 
 import patientService from '../../services/patients';
+
+// Components
 import EntryDetails from "./Entries";
+import AddEntryForm from "./AddEntryForm";
 
 
 const genderIcon = (gender: Gender) => {
@@ -46,14 +49,16 @@ const PatientViewPage = () => {
   
   return (
     <Box>
-      <br />
+      <br/>
       <Typography variant="h4" gutterBottom>
         {patient.name} {genderIcon(patient.gender)}
       </Typography>
-      <br />
+      <br/>
       <Typography>ssn: {patient.ssn}</Typography>
       <Typography>occupation: {patient.occupation}</Typography>
-      <br />
+      <br/>
+      <AddEntryForm/>
+      <br/>
       <Typography variant="h5">
         entries:
       </Typography>
